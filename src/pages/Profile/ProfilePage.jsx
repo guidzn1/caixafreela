@@ -1,18 +1,74 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { Header } from '../../components/Header/Header';
+import { AnnualReport } from '../../components/AnnualReport/AnnualReport';
 import styles from './ProfilePage.module.css';
 import toast from 'react-hot-toast';
+import { collection, query, where, getDocs, documentId } from 'firebase/firestore';
+import { db } from '../../firebase/config';
+
+const getMonthName = (monthNumber) => {
+  const date = new Date();
+  date.setMonth(monthNumber - 1);
+  return date.toLocaleString('pt-BR', { month: 'short' });
+};
 
 export const ProfilePage = () => {
   const { user, updateUserPassword } = useAuth();
-  const [currentPassword, setCurrentPassword] = useState(''); // NOVO ESTADO
+  
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [annualData, setAnnualData] = useState([]);
+  const [reportLoading, setReportLoading] = useState(true);
+  const [annualTotal, setAnnualTotal] = useState(0);
 
+  useEffect(() => {
+    const fetchAnnualData = async () => {
+      if (!user) return;
+      setReportLoading(true);
+
+      const startOfYear = `${selectedYear}-01`;
+      const endOfYear = `${selectedYear}-12`;
+      
+      const mesesRef = collection(db, 'users', user.uid, 'meses');
+      const q = query(mesesRef, where(documentId(), '>=', startOfYear), where(documentId(), '<=', endOfYear));
+      
+      const querySnapshot = await getDocs(q);
+      
+      const monthsData = Array.from({ length: 12 }, (_, i) => ({
+        name: getMonthName(i + 1).replace('.', '').charAt(0).toUpperCase() + getMonthName(i + 1).replace('.', '').slice(1),
+        Entradas: 0,
+        Saídas: 0,
+      }));
+
+      let totalFaturadoNoAno = 0;
+
+      querySnapshot.forEach(doc => {
+        const data = doc.data();
+        const monthIndex = parseInt(doc.id.split('-')[1], 10) - 1;
+        
+        const totalEntradas = data.entradas.reduce((acc, t) => acc + (t.valorReal || 0), 0);
+        const totalSaidas = data.saidas.reduce((acc, t) => acc + (t.valorReal || 0), 0);
+
+        monthsData[monthIndex].Entradas = totalEntradas;
+        monthsData[monthIndex].Saídas = totalSaidas;
+
+        totalFaturadoNoAno += totalEntradas;
+      });
+
+      setAnnualData(monthsData);
+      setAnnualTotal(totalFaturadoNoAno);
+      setReportLoading(false);
+    };
+
+    fetchAnnualData();
+  }, [user, selectedYear]);
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
     if (!currentPassword) {
       toast.error("Por favor, insira sua senha atual.");
       return;
@@ -25,26 +81,23 @@ export const ProfilePage = () => {
       toast.error("A nova senha precisa ter no mínimo 6 caracteres.");
       return;
     }
-
-    // A função agora espera a senha atual e a nova senha
     const promise = updateUserPassword(currentPassword, newPassword);
-
     toast.promise(promise, {
       loading: 'Atualizando senha...',
       success: 'Senha atualizada com sucesso!',
       error: (err) => {
-        // Fornece feedback mais específico para o erro de senha incorreta
         if (err.code === 'auth/wrong-password') {
           return 'A senha atual está incorreta.';
         }
         return 'Ocorreu um erro ao atualizar a senha.';
       }
     });
-
     setCurrentPassword('');
     setNewPassword('');
     setConfirmPassword('');
   };
+
+  const formatCurrency = (value) => (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   return (
     <div className={styles.profilePage}>
@@ -57,9 +110,8 @@ export const ProfilePage = () => {
             <span>{user?.email}</span>
           </div>
 
-          <form onSubmit={handleSubmit} className={styles.passwordForm}>
+          <form onSubmit={handlePasswordSubmit} className={styles.passwordForm}>
             <h3>Alterar Senha</h3>
-            {/* NOVO CAMPO PARA A SENHA ATUAL */}
             <div className={styles.inputGroup}>
               <label htmlFor="currentPassword">Senha Atual</label>
               <input
@@ -94,6 +146,26 @@ export const ProfilePage = () => {
             </div>
             <button type="submit" className={styles.saveButton}>Salvar Nova Senha</button>
           </form>
+        </div>
+
+        <div className={styles.reportContainer}>
+          <h2>Relatório Anual</h2>
+          <div className={styles.yearSelector}>
+            <button onClick={() => setSelectedYear(y => y - 1)}>&lt;</button>
+            <span>{selectedYear}</span>
+            <button onClick={() => setSelectedYear(y => y + 1)}>&gt;</button>
+          </div>
+          {reportLoading ? (
+            <p>A carregar o relatório...</p>
+          ) : (
+            <>
+              <div className={styles.totalCard}>
+                <span>Faturamento Total em {selectedYear}</span>
+                <p>{formatCurrency(annualTotal)}</p>
+              </div>
+              <AnnualReport data={annualData} />
+            </>
+          )}
         </div>
       </main>
     </div>

@@ -1,47 +1,56 @@
 .profilePage {
-  display: flex;
-  flex-direction: column;
   min-height: 100vh;
   background-color: var(--color-background);
 }
+
 .mainContent {
-  display: flex;
-  justify-content: center;
+  max-width: 900px;
+  margin: 0 auto;
   padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
 }
+
 .profileContainer {
   background-color: var(--color-surface);
   padding: 32px;
   border-radius: var(--border-radius);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-md);
   width: 100%;
-  max-width: 600px;
 }
+
 .profileContainer h2 {
   margin-bottom: 24px;
   border-bottom: 1px solid #eee;
   padding-bottom: 16px;
 }
+
 .userInfo {
   margin-bottom: 32px;
   font-size: 18px;
 }
+
 .userInfo strong {
   margin-right: 8px;
   color: var(--text-secondary);
 }
+
 .passwordForm h3 {
   margin-bottom: 20px;
   color: var(--text-primary);
 }
+
 .inputGroup {
   margin-bottom: 20px;
 }
+
 .inputGroup label {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
 }
+
 .inputGroup input {
   width: 100%;
   padding: 12px;
@@ -49,6 +58,7 @@
   border-radius: var(--border-radius);
   font-size: 16px;
 }
+
 .saveButton {
   background-color: var(--color-primary);
   color: white;
@@ -59,11 +69,60 @@
   cursor: pointer;
   transition: background-color 0.2s;
 }
+
 .saveButton:hover {
   background-color: #0056b3;
 }
+
 .divider {
   border: none;
   border-top: 1px solid #eee;
   margin: 24px 0;
+}
+
+/* --- Novos Estilos para o Relatório --- */
+.reportContainer {
+  background-color: var(--color-surface);
+  padding: 32px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  width: 100%;
+}
+
+.reportContainer h2 {
+  margin-bottom: 24px;
+}
+
+.yearSelector {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.yearSelector span {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 100px;
+  text-align: center;
+}
+
+.yearSelector button {
+  background-color: #f1f1f1;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.yearSelector button:hover {
+    background-color: #e2e2e2;
 }

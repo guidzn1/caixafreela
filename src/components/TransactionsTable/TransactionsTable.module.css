@@ -104,3 +104,12 @@
 .deleteButton {
   color: var(--color-danger);
 }
+.descriptionCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.recurringIcon {
+  color: var(--color-primary);
+  opacity: 0.7;
+}

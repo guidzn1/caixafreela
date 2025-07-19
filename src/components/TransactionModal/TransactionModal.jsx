@@ -9,25 +9,39 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
   const [valorReal, setValorReal] = useState('');
   const [categoria, setCategoria] = useState(CATEGORIAS_SAIDA[0]);
   const [data, setData] = useState(new Date().toISOString().slice(0, 10));
+  const [isRecorrente, setIsRecorrente] = useState(false);
+  
+  // Novos estados para o parcelamento
+  const [isParcelado, setIsParcelado] = useState(false);
+  const [totalParcelas, setTotalParcelas] = useState('');
+  const [parcelasPagas, setParcelasPagas] = useState('0');
 
   const isEditing = !!transactionToEdit;
 
   useEffect(() => {
     if (isOpen) {
       if (isEditing) {
+        // Popula o formulário para edição
         setDescricao(transactionToEdit.descricao);
         setValorPrevisto(transactionToEdit.valorPrevisto || '');
         setValorReal(transactionToEdit.valorReal || '');
         setData(transactionToEdit.data || new Date().toISOString().slice(0, 10));
+        setIsRecorrente(transactionToEdit.isRecorrente || false);
+        setIsParcelado(transactionToEdit.isParcelado || false);
         if (type === 'saidas') {
           setCategoria(transactionToEdit.categoria || CATEGORIAS_SAIDA[0]);
         }
       } else {
+        // Reseta o formulário para o modo de adição
         setDescricao('');
         setValorPrevisto('');
         setValorReal('');
         setCategoria(CATEGORIAS_SAIDA[0]);
         setData(new Date().toISOString().slice(0, 10));
+        setIsRecorrente(false);
+        setIsParcelado(false);
+        setTotalParcelas('');
+        setParcelasPagas('0');
       }
     }
   }, [transactionToEdit, isOpen, isEditing, type]);
@@ -43,6 +57,12 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
       valorPrevisto: parseFloat(valorPrevisto) || 0,
       valorReal: parseFloat(valorReal) || 0,
       confirmado: isEditing ? transactionToEdit.confirmado : false,
+      isRecorrente,
+      isParcelado,
+      parcelamentoInfo: isParcelado ? {
+        total: parseInt(totalParcelas),
+        pagas: parseInt(parcelasPagas) || 0
+      } : null,
       ...(type === 'saidas' && { categoria })
     };
     onSave(type, transactionData);
@@ -62,7 +82,7 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
             <input type="date" value={data} onChange={(e) => setData(e.target.value)} required />
           </div>
           <div className={styles.inputGroup}>
-            <label>Valor Previsto</label>
+            <label>Valor Previsto {isParcelado && '(Valor Total da Compra)'}</label>
             <input type="number" step="0.01" value={valorPrevisto} onChange={(e) => setValorPrevisto(e.target.value)} required />
           </div>
           <div className={styles.inputGroup}>
@@ -77,6 +97,49 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
               </select>
             </div>
           )}
+          
+          {!isEditing && (
+            <>
+              <div className={styles.checkboxGroup}>
+                <input 
+                  type="checkbox" 
+                  id="recorrente" 
+                  checked={isRecorrente} 
+                  onChange={(e) => setIsRecorrente(e.target.checked)}
+                  disabled={isParcelado} 
+                />
+                <label htmlFor="recorrente">É uma transação recorrente (mensal)?</label>
+              </div>
+
+              {type === 'saidas' && (
+                <div className={styles.checkboxGroup}>
+                  <input 
+                    type="checkbox" 
+                    id="parcelado" 
+                    checked={isParcelado} 
+                    onChange={(e) => setIsParcelado(e.target.checked)}
+                    disabled={isRecorrente}
+                  />
+                  <label htmlFor="parcelado">É uma compra parcelada?</label>
+                </div>
+              )}
+
+              {isParcelado && type === 'saidas' && (
+                <div className={styles.parcelamentoFields}>
+                  <div className={styles.inputGroup}>
+                    <label>Número Total de Parcelas</label>
+                    <input type="number" value={totalParcelas} onChange={(e) => setTotalParcelas(e.target.value)} placeholder="Ex: 12" required />
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <label>Parcelas Já Pagas (opcional)</label>
+                    <input type="number" value={parcelasPagas} onChange={(e) => setParcelasPagas(e.target.value)} placeholder="Ex: 3" />
+                  </div>
+                  <p className={styles.infoText}>O "Valor Previsto" que você inseriu deve ser o valor TOTAL da compra.</p>
+                </div>
+              )}
+            </>
+          )}
+
           <div className={styles.buttonGroup}>
             <button type="button" onClick={onClose} className={styles.cancelButton}>Cancelar</button>
             <button type="submit" className={styles.saveButton}>Salvar</button>

@@ -1,5 +1,6 @@
 import { EmptyState } from '../EmptyState/EmptyState';
 import styles from './TransactionsTable.module.css';
+import { Repeat, Layers } from 'lucide-react';
 
 export const TransactionsTable = ({ title, data = [], type, onAdd, onEdit, onDelete, onToggleConfirm }) => {
   const formatCurrency = (value) => (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -8,11 +9,9 @@ export const TransactionsTable = ({ title, data = [], type, onAdd, onEdit, onDel
     <div className={styles.tableContainer}>
       <div className={styles.header}>
         <h2>{title}</h2>
-        {/* Podemos manter ou remover este botão depois de adicionar os atalhos rápidos */}
         <button onClick={() => onAdd(type)} className={styles.addButton}>+ Adicionar</button>
       </div>
       
-      {/* A MUDANÇA ESTÁ AQUI */}
       {data.length > 0 ? (
         <table className={styles.table}>
           <thead>
@@ -30,7 +29,11 @@ export const TransactionsTable = ({ title, data = [], type, onAdd, onEdit, onDel
               <tr key={item.id} className={item.confirmado ? styles.confirmed : ''}>
                 <td><input type="checkbox" checked={item.confirmado} onChange={() => onToggleConfirm(type, item)} /></td>
                 {type === 'saidas' && <td>{item.categoria}</td>}
-                <td>{item.descricao}</td>
+                <td className={styles.descriptionCell}>
+                  <span>{item.descricao}</span>
+                  {item.isRecorrente && <Repeat size={14} className={styles.recurringIcon} title="Transação Recorrente"/>}
+                  {item.isParcelado && <Layers size={14} className={styles.recurringIcon} title="Compra Parcelada"/>}
+                </td>
                 <td>{formatCurrency(item.valorPrevisto)}</td>
                 <td className={type === 'entradas' ? styles.entrada : styles.saida}>{formatCurrency(item.valorReal)}</td>
                 <td className={styles.actions}>
