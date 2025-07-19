@@ -152,12 +152,8 @@
   cursor: pointer;
   z-index: 1001;
 }
-.overlay {
-  display: none;
-}
-.mobileMenu {
-  display: none;
-}
+
+
 
 /* --- ESTILOS DE RESPONSIVIDADE --- */
 @media (max-width: 1024px) {
