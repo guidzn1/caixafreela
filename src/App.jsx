@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
-import { LoginPage } from './pages/Login/LoginPage';
+import { LoginPage } from './pages/login/LoginPage';
 import { RegisterPage } from './pages/Register/RegisterPage';
 import { DashboardPage } from './pages/Dashboard/DashboardPage';
 import { ProfilePage } from './pages/Profile/ProfilePage'; // 1. IMPORTE A NOVA PÁGINA
