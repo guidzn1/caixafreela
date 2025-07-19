@@ -1,0 +1,30 @@
+.card {
+  background-color: var(--color-surface);
+  padding: 24px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.title { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+.amount { font-size: 28px; font-weight: 700; color: var(--color-primary); margin-bottom: 16px; }
+.progressContainer { width: 100%; background-color: #e9ecef; border-radius: 8px; height: 10px; overflow: hidden; margin-bottom: 8px; }
+.progressBar { height: 100%; background-color: var(--color-success); border-radius: 8px; transition: width 0.5s ease-in-out; }
+.goal { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; }
+.actions { display: flex; gap: 16px; margin-top: auto; }
+.actionButton { padding: 8px 16px; border-radius: var(--border-radius); border: 1px solid #ccc; background: none; cursor: pointer; font-weight: 500; }
+.depositButton { background-color: var(--color-success); color: white; border-color: var(--color-success); }
+.deleteButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #f1f1f1;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--text-secondary);
+}

@@ -1,0 +1,106 @@
+.tableContainer {
+  background-color: var(--color-surface);
+  padding: 24px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header h2 {
+  font-size: 20px;
+  color: var(--text-primary);
+}
+
+.addButton {
+  background-color: var(--color-success);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.addButton:hover {
+  background-color: #218838;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 16px 8px; /* Aumentei o padding para mais respiro */
+  text-align: left;
+  border-bottom: 1px solid #f1f5f9; /* Borda mais suave */
+}
+
+.table th {
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 12px; /* Fonte menor para cabeçalhos */
+  text-transform: uppercase;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.entrada {
+  color: var(--color-success);
+  font-weight: 500;
+}
+
+.saida {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.table td input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* --- MUDANÇA 1: DESTAQUE VISUAL PARA LINHAS CONFIRMADAS --- */
+.confirmed td {
+  color: var(--text-secondary);
+  text-decoration: line-through;
+}
+
+.confirmed:hover td {
+  background-color: #f1f5f9; /* Cor de hover para linhas confirmadas */
+}
+
+/* --- MUDANÇA 2: AÇÕES QUE APARECEM NO HOVER --- */
+.actions {
+  text-align: right;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  margin-left: 16px;
+  font-weight: 600;
+  opacity: 0; /* Por padrão, os botões ficam invisíveis */
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Quando o rato passa sobre a LINHA da tabela (tr), os botões dentro dela aparecem */
+.table tbody tr:hover .actionButton {
+  opacity: 1;
+}
+
+.deleteButton {
+  color: var(--color-danger);
+}

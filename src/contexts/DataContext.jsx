@@ -1,0 +1,213 @@
+import { createContext, useState, useEffect, useContext } from 'react';
+import {
+  collection,
+  doc,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+  getDoc,
+  addDoc,
+  deleteDoc,
+  runTransaction
+} from 'firebase/firestore';
+import { db } from '../firebase/config';
+import { useAuth } from '../hooks/useAuth';
+import { format, subMonths, addMonths } from 'date-fns';
+import toast from 'react-hot-toast';
+
+export const DataContext = createContext();
+
+export const DataProvider = ({ children }) => {
+  const { user } = useAuth();
+  
+  // Estados para dados mensais
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [monthlyData, setMonthlyData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Estados para a IA
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState('');
+
+  // Estados para os Cofrinhos
+  const [cofrinhos, setCofrinhos] = useState([]);
+  const [cofrinhosLoading, setCofrinhosLoading] = useState(true);
+
+  const monthId = format(currentDate, 'yyyy-MM');
+
+  // useEffect para buscar dados MENSAIS
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      setMonthlyData(null);
+      return;
+    }
+    setLoading(true);
+    setAiAnalysis('');
+    const docRef = doc(db, 'users', user.uid, 'meses', monthId);
+    
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setMonthlyData(docSnap.data());
+      } else {
+        const defaultData = {
+          entradas: [],
+          saidas: [],
+          saldoInicial: 0,
+        };
+        setDoc(docRef, defaultData);
+        setMonthlyData(defaultData);
+      }
+      setLoading(false);
+    });
+    
+    return () => unsubscribe();
+  }, [user, monthId]);
+
+  // useEffect para buscar os COFRINHOS
+  useEffect(() => {
+    if (!user) {
+      setCofrinhos([]);
+      setCofrinhosLoading(false);
+      return;
+    }
+    setCofrinhosLoading(true);
+    const cofrinhosCollectionRef = collection(db, 'users', user.uid, 'cofrinhos');
+    
+    const unsubscribe = onSnapshot(cofrinhosCollectionRef, (snapshot) => {
+      const cofrinhosData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setCofrinhos(cofrinhosData);
+      setCofrinhosLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  // --- Funções ---
+  const getDocRef = (targetMonthId = monthId) => {
+    if (!user) return null;
+    return doc(db, 'users', user.uid, 'meses', targetMonthId);
+  };
+
+  const addTransaction = async (type, transactionData) => {
+    const docRef = getDocRef();
+    if (!docRef || !monthlyData) return;
+    const newTransaction = { ...transactionData, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
+    const updatedArray = [...monthlyData[type], newTransaction];
+    await updateDoc(docRef, { [type]: updatedArray });
+  };
+
+  const updateTransaction = async (type, updatedTransaction) => {
+    const docRef = getDocRef();
+    if (!docRef || !monthlyData) return;
+    const updatedArray = monthlyData[type].map(t => t.id === updatedTransaction.id ? updatedTransaction : t);
+    await updateDoc(docRef, { [type]: updatedArray });
+  };
+  
+  const updateSaldoInicial = async (novoSaldo) => {
+    const docRef = getDocRef();
+    if (!docRef) return;
+    await updateDoc(docRef, { saldoInicial: parseFloat(novoSaldo) || 0 });
+  };
+
+  const deleteTransaction = async (type, transactionId) => {
+    const docRef = getDocRef();
+    if (!docRef || !monthlyData) return;
+    const updatedArray = monthlyData[type].filter(t => t.id !== transactionId);
+    await updateDoc(docRef, { [type]: updatedArray });
+  };
+
+  const changeMonth = (direction) => {
+    if (direction === 'next') {
+      setCurrentDate(prev => addMonths(prev, 1));
+    } else {
+      setCurrentDate(prev => subMonths(prev, 1));
+    }
+  };
+
+  const copyPreviousMonth = async () => {
+    if (!window.confirm("Isso substituirá todos os dados do mês atual. Deseja continuar?")) return;
+    const previousMonth = subMonths(currentDate, 1);
+    const previousMonthId = format(previousMonth, 'yyyy-MM');
+    const prevDocRef = getDocRef(previousMonthId);
+    const currentDocRef = getDocRef();
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const docSnap = await getDoc(prevDocRef);
+        if (docSnap.exists()) {
+          const prevData = docSnap.data();
+          const newEntradas = prevData.entradas.map(e => ({ ...e, confirmado: false, valorReal: 0 }));
+          const newSaidas = prevData.saidas.map(s => ({ ...s, confirmado: false, valorReal: 0 }));
+          await setDoc(currentDocRef, { ...prevData, saldoInicial: prevData.saldoInicial, entradas: newEntradas, saidas: newSaidas });
+          resolve("Dados copiados com sucesso!");
+        } else {
+          reject("Nenhum dado encontrado para o mês anterior.");
+        }
+      } catch (error) {
+        console.error("Erro ao copiar dados:", error);
+        reject("Ocorreu um erro ao copiar os dados.");
+      }
+    });
+    toast.promise(promise, { loading: 'Copiando dados...', success: (message) => message, error: (message) => message });
+  };
+
+  const getFinancialAnalysis = async () => {
+    if (!monthlyData) return;
+    setIsAiLoading(true);
+    setAiAnalysis('');
+    const { saldoInicial, entradas, saidas } = monthlyData;
+    const totalEntradasReal = entradas.reduce((acc, t) => acc + (t.valorReal || 0), 0);
+    const totalSaidasReal = saidas.reduce((acc, t) => acc + (t.valorReal || 0), 0);
+    const saldoFinalReal = saldoInicial + totalEntradasReal - totalSaidasReal;
+
+    const userDataForPrompt = `
+      - Saldo Inicial: ${saldoInicial.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}
+      - Total de Entradas Realizadas: ${totalEntradasReal.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})} (${entradas.length} transações)
+      - Total de Saídas Realizadas: ${totalSaidasReal.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})} (${saidas.length} transações)
+      - Saldo Final Real: ${saldoFinalReal.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}
+    `;
+
+    try {
+      const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+      if (!apiKey) throw new Error("Chave de API da Groq não encontrada.");
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: "Você é um consultor financeiro para freelancers no Brasil. Sua resposta deve ser concisa, em português, com 3 a 4 tópicos (bullet points usando *), e incluir uma dica prática. Use um tom amigável e profissional." },
+            { role: "user", content: `Analise os seguintes dados financeiros do meu mês e me dê um resumo: ${userDataForPrompt}` }
+          ],
+          model: "llama3-8b-8192"
+        })
+      });
+      if (!response.ok) throw new Error("Falha na resposta da API da Groq.");
+      const result = await response.json();
+      const analysisText = result.choices[0]?.message?.content || "Não foi possível obter uma análise.";
+      setAiAnalysis(analysisText);
+    } catch (error) {
+      console.error("Erro na API Groq:", error);
+      setAiAnalysis("Desculpe, não foi possível gerar a análise. Verifique sua chave de API e a conexão.");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const addCofrinho = async (cofrinhoData) => { /* ... (sem alteração) ... */ };
+  const deleteCofrinho = async (cofrinhoId) => { /* ... (sem alteração) ... */ };
+  const updateCofrinhoValue = async (cofrinhoId, amount, type) => { /* ... (sem alteração) ... */ };
+
+  const value = {
+    monthlyData, loading, currentDate, addTransaction, updateTransaction, deleteTransaction,
+    updateSaldoInicial, aiAnalysis, isAiLoading, getFinancialAnalysis, changeMonth, copyPreviousMonth,
+    cofrinhos, cofrinhosLoading, addCofrinho, deleteCofrinho, updateCofrinhoValue
+  };
+
+  return (
+    <DataContext.Provider value={value}>
+      {children}
+    </DataContext.Provider>
+  );
+};
+
+export const useData = () => useContext(DataContext);

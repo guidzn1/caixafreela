@@ -1,0 +1,240 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--color-background);
+}
+.form {
+  background-color: var(--color-surface);
+  padding: 40px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+.form h2 {
+  margin-bottom: 24px;
+  color: var(--text-primary);
+}
+.inputGroup {
+  margin-bottom: 20px;
+  text-align: left;
+}
+.inputGroup label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.inputGroup input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+}
+.button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.button:hover {
+  background-color: #0056b3;
+}
+.error {
+  color: var(--color-danger);
+  margin-bottom: 16px;
+  background-color: #f8d7da;
+  padding: 10px;
+  border-radius: var(--border-radius);
+}
+.linkText {
+  margin-top: 20px;
+  color: var(--text-secondary);
+}
+.linkText a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+/* ... (todo o seu css anterior) ... */
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 24px 0;
+  color: var(--text-secondary);
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #ccc;
+}
+.divider span {
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.googleButton {
+  width: 100%;
+  padding: 12px;
+  background-color: #fff;
+  color: #444;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.googleButton:hover {
+  background-color: #f8f8f8;
+}
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--color-background);
+  padding: 20px;
+}
+
+/* NOVO WRAPPER */
+.formWrapper {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* NOVO ESTILO PARA O LOGO */
+.loginLogo {
+  width: 250px;
+  height: auto;
+  margin-bottom: 32px;
+}
+
+.form {
+  background-color: var(--color-surface);
+  padding: 40px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  text-align: center;
+}
+
+.form h2 {
+  margin-bottom: 24px;
+  color: var(--text-primary);
+}
+
+.inputGroup {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.inputGroup label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+}
+
+.button {
+  width: 100%;
+  padding: 12px;
+  background: var(--gradient-primary); /* Usando o gradiente */
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+.button:hover {
+  filter: brightness(1.1);
+}
+
+.error {
+  color: var(--color-danger);
+  margin-bottom: 16px;
+  background-color: #f8d7da;
+  padding: 10px;
+  border-radius: var(--border-radius);
+}
+
+.linkText {
+  margin-top: 20px;
+  color: var(--text-secondary);
+}
+
+.linkText a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 24px 0;
+  color: var(--text-secondary);
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #ccc;
+}
+.divider span {
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ESTILO DO BOTÃO GOOGLE ATUALIZADO */
+.googleButton {
+  width: 100%;
+  padding: 12px;
+  background-color: #fff;
+  color: #444;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+
+  /* Novas propriedades para alinhar o ícone */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px; /* Espaço entre o ícone e o texto */
+}
+
+.googleButton:hover {
+  background-color: #f8f8f8;
+}

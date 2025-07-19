@@ -1,0 +1,58 @@
+/* ... (código anterior sem alteração) ... */
+.inputGroup select { /* Adicione este novo estilo para o select */
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  background-color: white;
+}
+/* ... (resto do código sem alteração) ... */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal {
+  background: var(--color-surface);
+  padding: 32px;
+  border-radius: var(--border-radius);
+  width: 100%;
+  max-width: 500px;
+}
+.modal h2 { margin-bottom: 24px; }
+.inputGroup { margin-bottom: 20px; }
+.inputGroup label { display: block; margin-bottom: 8px; font-weight: 500; }
+.inputGroup input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+}
+.buttonGroup {
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+.cancelButton, .saveButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+}
+.cancelButton {
+  background-color: #e9ecef;
+  color: var(--text-secondary);
+}
+.saveButton {
+  background-color: var(--color-primary);
+  color: white;
+}

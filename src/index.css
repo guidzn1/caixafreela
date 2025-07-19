@@ -1,0 +1,36 @@
+/* Definindo variáveis de cor para usar em todo o projeto */
+:root {
+  --color-background: #f4f7fa; /* Um cinza azulado mais suave */
+  --color-surface: #FFFFFF;
+  
+  /* O nosso novo gradiente! */
+  --gradient-primary: linear-gradient(45deg, #0d6efd, #0a58ca);
+  --color-primary: #0d6efd; /* Mantemos uma cor sólida como fallback */
+
+  --color-success: #198754;
+  --color-danger: #dc3545;
+  --color-highlight: #6F42C1;
+
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+
+  --border-radius: 8px;
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Reset básico e fontes */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-background);
+  color: var(--text-primary);
+}
+
+/* Importando a fonte Inter do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');

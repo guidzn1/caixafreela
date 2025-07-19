@@ -1,0 +1,6 @@
+.page { min-height: 100vh; background-color: var(--color-background); }
+.mainContent { max-width: 1200px; margin: 0 auto; padding: 32px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+.header h1 { font-size: 28px; }
+.addButton { background-color: var(--color-primary); color: white; border: none; padding: 10px 20px; border-radius: var(--border-radius); font-weight: 600; cursor: pointer; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
