@@ -1,12 +1,13 @@
 .header {
-  background: var(--gradient-primary); /* USANDO O GRADIENTE */
+  background: var(--gradient-primary);
   padding: 0 32px;
   box-shadow: var(--shadow-md);
   width: 100%;
   height: 72px;
-  color: white; /* Cor do texto principal para contraste */
+  color: white;
+  position: relative;
+  z-index: 10;
 }
-
 .container {
   max-width: 1400px;
   height: 100%;
@@ -15,62 +16,56 @@
   justify-content: space-between;
   align-items: center;
 }
-
 .leftSection {
   display: flex;
   align-items: center;
   gap: 40px;
 }
-
 .logoLink {
   text-decoration: none;
   color: inherit;
 }
-
 .logo {
   height: 40px;
   width: auto;
   display: block;
 }
-
+.navWrapper {
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+}
 .nav {
   display: flex;
   gap: 24px;
 }
-
 .navLink {
   font-size: 16px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.8); /* Cor mais suave para links inativos */
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
   padding: 24px 0;
   border-bottom: 2px solid transparent;
   transition: all 0.2s;
 }
-
 .navLink:hover {
   color: white;
 }
-
 .navLink.active {
   color: white;
   border-bottom-color: white;
 }
-
 .centerSection {
-  display: flex;
-  justify-content: center;
+  /* Estilos para desktop */
 }
-
 .monthSelector {
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: rgba(255, 255, 255, 0.1); /* Fundo translúcido */
+  background-color: rgba(255, 255, 255, 0.1);
   padding: 6px;
   border-radius: var(--border-radius);
 }
-
 .monthText {
   font-size: 16px;
   font-weight: 600;
@@ -79,7 +74,6 @@
   width: 150px;
   text-align: center;
 }
-
 .monthButton {
   background: none;
   border: none;
@@ -92,23 +86,20 @@
   border-radius: 6px;
   transition: background-color 0.2s;
 }
-
 .monthButton:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
-
 .rightSection {
   display: flex;
   align-items: center;
   gap: 16px;
 }
-
 .iconButton {
   display: flex;
   align-items: center;
   gap: 8px;
   background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.5); /* Borda mais sutil */
+  border: 1px solid rgba(255, 255, 255, 0.5);
   padding: 8px 12px;
   border-radius: var(--border-radius);
   color: rgba(255, 255, 255, 0.9);
@@ -116,26 +107,26 @@
   cursor: pointer;
   transition: all 0.2s;
 }
-
+.iconButtonText {
+  /* Este span será escondido no móvel */
+}
 .iconButton:hover {
   background-color: rgba(255, 255, 255, 0.1);
   border-color: white;
   color: white;
 }
-
 .profileLink {
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
 }
-
 .profileCircle {
   width: 36px;
   height: 36px;
   border-radius: 50%;
   background-color: white;
-  color: var(--color-primary); /* Cor do texto invertida */
+  color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -143,7 +134,124 @@
   font-size: 16px;
   transition: transform 0.2s;
 }
-
 .profileLink:hover .profileCircle {
   transform: scale(1.1);
+}
+
+.hamburgerButton {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+/* Esconde as ações móveis por padrão */
+.mobileActions {
+  display: none;
+}
+
+/* --- ESTILOS DE RESPONSIVIDADE --- */
+@media (max-width: 1024px) {
+  .navWrapper {
+    position: absolute;
+    top: 72px;
+    left: 0;
+    width: 100%;
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-md);
+    padding: 24px;
+    transform: translateY(-150%);
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column; /* Organiza os itens do menu */
+  }
+  .navOpen {
+    transform: translateY(0);
+  }
+  .nav {
+    flex-direction: column;
+    align-items: flex-start; /* Alinha links à esquerda */
+    gap: 0;
+    width: 100%;
+  }
+  .navLink {
+    padding: 16px;
+    border: none;
+    font-size: 18px;
+    width: 100%;
+    border-radius: var(--border-radius);
+  }
+  .navLink.active {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  .hamburgerButton {
+    display: block;
+  }
+  .leftSection {
+    flex-grow: 1;
+    justify-content: flex-start;
+  }
+  .centerSection {
+    position: absolute; /* Permite que o seletor de mês fique centralizado sem empurrar outros itens */
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  /* ESCONDE A SESSÃO DA DIREITA NO DESKTOP */
+  .rightSection {
+    display: none;
+  }
+
+  /* MOSTRA E ESTILIZA AS AÇÕES NO MENU MÓVEL */
+  .mobileActions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-top: 24px;
+  }
+  .mobileDivider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 16px 0;
+  }
+  .mobileProfileLink {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    font-size: 18px;
+    border-radius: var(--border-radius);
+  }
+  .mobileProfileLink:hover, .mobileButton:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  .mobileButton {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 16px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: 0 16px;
+  }
+  .centerSection {
+    display: none;
+  }
 }
