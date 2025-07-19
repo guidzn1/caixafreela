@@ -22,6 +22,8 @@ export const DashboardPage = () => {
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const summary = useMemo(() => {
+    console.log(`%c4. [DashboardPage] O monthlyData mudou! A recalcular o resumo...`, 'color: green; font-weight: bold;', monthlyData);
+
     if (!monthlyData) {
       return { totalEntradasPrevisto: 0, totalEntradasReal: 0, totalSaidasPrevisto: 0, totalSaidasReal: 0, saldoInicial: 0, caixaFinalReal: 0, caixaFinalPrevisto: 0, entradasProgress: 0, saidasProgress: 0 };
     }
@@ -36,39 +38,34 @@ export const DashboardPage = () => {
     const entradasProgress = totalEntradasPrevisto > 0 ? (totalEntradasReal / totalEntradasPrevisto) * 100 : 0;
     const saidasProgress = totalSaidasPrevisto > 0 ? (totalSaidasReal / totalSaidasPrevisto) * 100 : 0;
 
+    console.log(`%c5. [DashboardPage] Novo progresso calculado: ${entradasProgress}%`, 'color: green; font-weight: bold;');
+
     return { totalEntradasPrevisto, totalEntradasReal, totalSaidasPrevisto, totalSaidasReal, saldoInicial, caixaFinalReal, caixaFinalPrevisto, entradasProgress, saidasProgress };
   }, [monthlyData]);
 
   const insights = useMemo(() => {
     if (!monthlyData || !user) return { userName: '', biggestExpense: null, biggestIncome: null };
-
     const userName = user.displayName ? user.displayName.split(' ')[0] : (user.email.split('@')[0] || '');
     const capitalizedUserName = userName.charAt(0).toUpperCase() + userName.slice(1);
-
     const biggestExpense = monthlyData.saidas.length > 0
       ? [...monthlyData.saidas].sort((a, b) => (b.valorReal || 0) - (a.valorReal || 0))[0]
       : null;
-
     const biggestIncome = monthlyData.entradas.length > 0
       ? [...monthlyData.entradas].sort((a, b) => (b.valorReal || 0) - (a.valorReal || 0))[0]
       : null;
-
     return { userName: capitalizedUserName, biggestExpense, biggestIncome };
   }, [monthlyData, user]);
 
   const formatCurrency = (value) => (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
   const handleOpenModal = (type, transaction = null) => {
     setModalType(type);
     setTransactionToEdit(transaction);
     setIsModalOpen(true);
   };
-
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setTransactionToEdit(null);
   };
-
   const handleSaveTransaction = async (type, transactionData) => {
     const dataComTimestamp = { ...transactionData, updatedAt: new Date().toISOString() };
     if (transactionData.id) {
@@ -78,12 +75,10 @@ export const DashboardPage = () => {
     }
     handleCloseModal();
   };
-  
   const handleDeleteTransaction = (type, transactionId) => {
     setDeleteTarget({ type, id: transactionId });
     setIsConfirmModalOpen(true);
   };
-
   const handleConfirmDelete = async () => {
     if (deleteTarget) {
       await deleteTransaction(deleteTarget.type, deleteTarget.id);
@@ -95,11 +90,14 @@ export const DashboardPage = () => {
 
   const handleToggleConfirm = async (type, transaction) => {
     const isConfirming = !transaction.confirmado;
-    const valorReal = isConfirming && (!transaction.valorReal || transaction.valorReal === 0)
-      ? transaction.valorPrevisto 
-      : (isConfirming ? transaction.valorReal : 0);
-      
-    const updatedTransaction = { ...transaction, confirmado: isConfirming, valorReal: valorReal };
+    let newValorReal = transaction.valorReal;
+    if (isConfirming && (!newValorReal || newValorReal === 0)) {
+      newValorReal = transaction.valorPrevisto;
+    }
+    const updatedTransaction = { ...transaction, confirmado: isConfirming, valorReal: newValorReal };
+    
+    console.log(`%c1. [DashboardPage] Cliquei no checkbox. Vou enviar esta transação atualizada:`, 'color: orange; font-weight: bold;', updatedTransaction);
+
     await updateTransaction(type, updatedTransaction);
   };
 

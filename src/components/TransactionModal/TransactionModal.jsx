@@ -10,8 +10,8 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
   const [categoria, setCategoria] = useState(CATEGORIAS_SAIDA[0]);
   const [data, setData] = useState(new Date().toISOString().slice(0, 10));
   const [isRecorrente, setIsRecorrente] = useState(false);
+  const [mesesRecorrencia, setMesesRecorrencia] = useState('12');
   
-  // Novos estados para o parcelamento
   const [isParcelado, setIsParcelado] = useState(false);
   const [totalParcelas, setTotalParcelas] = useState('');
   const [parcelasPagas, setParcelasPagas] = useState('0');
@@ -21,7 +21,6 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
   useEffect(() => {
     if (isOpen) {
       if (isEditing) {
-        // Popula o formulário para edição
         setDescricao(transactionToEdit.descricao);
         setValorPrevisto(transactionToEdit.valorPrevisto || '');
         setValorReal(transactionToEdit.valorReal || '');
@@ -32,13 +31,13 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
           setCategoria(transactionToEdit.categoria || CATEGORIAS_SAIDA[0]);
         }
       } else {
-        // Reseta o formulário para o modo de adição
         setDescricao('');
         setValorPrevisto('');
         setValorReal('');
         setCategoria(CATEGORIAS_SAIDA[0]);
         setData(new Date().toISOString().slice(0, 10));
         setIsRecorrente(false);
+        setMesesRecorrencia('12');
         setIsParcelado(false);
         setTotalParcelas('');
         setParcelasPagas('0');
@@ -58,6 +57,7 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
       valorReal: parseFloat(valorReal) || 0,
       confirmado: isEditing ? transactionToEdit.confirmado : false,
       isRecorrente,
+      mesesRecorrencia: parseInt(mesesRecorrencia),
       isParcelado,
       parcelamentoInfo: isParcelado ? {
         total: parseInt(totalParcelas),
@@ -108,8 +108,17 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
                   onChange={(e) => setIsRecorrente(e.target.checked)}
                   disabled={isParcelado} 
                 />
-                <label htmlFor="recorrente">É uma transação recorrente (mensal)?</label>
+                <label htmlFor="recorrente">É uma transação recorrente?</label>
               </div>
+
+              {isRecorrente && (
+                <div className={styles.parcelamentoFields}>
+                  <div className={styles.inputGroup}>
+                    <label>Repetir por quantos meses?</label>
+                    <input type="number" value={mesesRecorrencia} onChange={(e) => setMesesRecorrencia(e.target.value)} placeholder="Ex: 12" min="2" max="60" required />
+                  </div>
+                </div>
+              )}
 
               {type === 'saidas' && (
                 <div className={styles.checkboxGroup}>

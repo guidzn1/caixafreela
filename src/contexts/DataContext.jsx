@@ -21,22 +21,16 @@ export const DataContext = createContext();
 export const DataProvider = ({ children }) => {
   const { user } = useAuth();
   
-  // Estados para dados mensais
   const [currentDate, setCurrentDate] = useState(new Date());
   const [monthlyData, setMonthlyData] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Estados para a IA
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState('');
-
-  // Estados para os Cofrinhos
   const [cofrinhos, setCofrinhos] = useState([]);
   const [cofrinhosLoading, setCofrinhosLoading] = useState(true);
 
   const monthId = format(currentDate, 'yyyy-MM');
 
-  // useEffect para buscar dados MENSAIS
   useEffect(() => {
     if (!user) {
       setLoading(false);
@@ -48,6 +42,8 @@ export const DataProvider = ({ children }) => {
     const docRef = doc(db, 'users', user.uid, 'meses', monthId);
     
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      console.log(`%c6. [DataContext] O Firebase notificou uma mudança! A atualizar o estado...`, 'color: purple; font-weight: bold;', docSnap.data());
+      
       if (docSnap.exists()) {
         setMonthlyData(docSnap.data());
       } else {
@@ -65,7 +61,6 @@ export const DataProvider = ({ children }) => {
     return () => unsubscribe();
   }, [user, monthId]);
 
-  // useEffect para buscar os COFRINHOS
   useEffect(() => {
     if (!user) {
       setCofrinhos([]);
@@ -84,7 +79,6 @@ export const DataProvider = ({ children }) => {
     return () => unsubscribe();
   }, [user]);
 
-  // --- Funções ---
   const getDocRef = (targetMonthId = monthId) => {
     if (!user) return null;
     return doc(db, 'users', user.uid, 'meses', targetMonthId);
@@ -139,18 +133,23 @@ export const DataProvider = ({ children }) => {
       toast.dismiss();
       toast.success('Compra parcelada adicionada com sucesso!');
     } else {
-      const isRecorrente = transactionData.isRecorrente;
+      const { isRecorrente, mesesRecorrencia } = transactionData;
       const recorrenciaId = isRecorrente ? crypto.randomUUID() : null;
       const newTransaction = { ...transactionData, id: crypto.randomUUID(), createdAt: new Date().toISOString(), recorrenciaId };
+      
       const currentDocRef = getDocRef();
       const currentData = monthlyData || { entradas: [], saidas: [], saldoInicial: 0 };
       const currentUpdatedArray = [...currentData[type], newTransaction];
+      
       await updateDoc(currentDocRef, { [type]: currentUpdatedArray });
 
       if (isRecorrente) {
+        const numMeses = Math.max(2, Math.min(mesesRecorrencia || 2, 60)); 
+        
         toast.loading('A criar transações recorrentes...');
         let lastDate = currentDate;
-        for (let i = 0; i < 11; i++) {
+        
+        for (let i = 0; i < numMeses - 1; i++) {
           lastDate = addMonths(lastDate, 1);
           const futureMonthId = format(lastDate, 'yyyy-MM');
           const futureDocRef = doc(db, 'users', user.uid, 'meses', futureMonthId);
@@ -165,15 +164,19 @@ export const DataProvider = ({ children }) => {
           }
         }
         toast.dismiss();
-        toast.success('Transação recorrente criada para os próximos 12 meses!');
+        toast.success(`Transação recorrente criada para os próximos ${numMeses} meses!`);
       }
     }
   };
   
   const updateTransaction = async (type, updatedTransaction) => {
+    console.log(`%c2. [DataContext] Recebi o pedido para atualizar. Objeto:`, 'color: blue; font-weight: bold;', updatedTransaction);
+    
     const docRef = getDocRef();
     if (!docRef || !monthlyData) return;
     const updatedArray = monthlyData[type].map(t => t.id === updatedTransaction.id ? updatedTransaction : t);
+    
+    console.log(`%c3. [DataContext] Array atualizado pronto para ser salvo no Firebase:`, 'color: blue; font-weight: bold;', updatedArray);
     await updateDoc(docRef, { [type]: updatedArray });
   };
   
