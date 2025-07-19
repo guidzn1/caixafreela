@@ -17,7 +17,7 @@ function App() {
         <Route path="/" element={user ? <DashboardPage /> : <Navigate to="/login" />} />
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/" />} />
         <Route path="/cadastro" element={!user ? <RegisterPage /> : <Navigate to="/" />} />
-        {/* 2. ADICIONE A NOVA ROTA PROTEGIDA */}
+        {/* 2. ADICIONE A NOVA ROTA PROTEGIDAA */}
         <Route path="/perfil" element={user ? <ProfilePage /> : <Navigate to="/login" />} />
          <Route path="/cofrinhos" element={user ? <CofrinhosPage /> : <Navigate to="/login" />} />
       </Routes>
