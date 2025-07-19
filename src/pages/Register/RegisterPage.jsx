@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { Link, useNavigate } from 'react-router-dom';
-import styles from '../Login/LoginPage.module.css';
+import styles from '../login/LoginPage.module.css';
 import toast from 'react-hot-toast';
 import { GoogleIcon } from '../../components/GoogleIcon/GoogleIcon';
 
