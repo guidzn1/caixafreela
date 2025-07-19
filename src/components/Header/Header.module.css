@@ -1,18 +1,13 @@
 /* --- ESTRUTURA PRINCIPAL COM GRADIENTE AZUL + EFEITO GLASSMORPHISM --- */
 .header {
-  /* Gradiente azul semi-transparente */
   background: linear-gradient(45deg, rgba(13, 110, 253, 0.85), rgba(10, 88, 202, 0.85));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  
   padding: 0 32px;
   width: 100%;
   height: 72px;
-  color: white; /* Cor do texto principal volta a ser branco */
-  
-  /* Borda sutil na parte de baixo */
+  color: white;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-
   position: sticky;
   top: 0;
   z-index: 10;
@@ -63,9 +58,7 @@
 }
 
 /* --- SEÇÃO CENTRAL (SELETOR DE MÊS) --- */
-.centerSection {
-  /* Fica no meio por padrão em telas grandes */
-}
+.centerSection {}
 .monthSelector {
   display: flex;
   align-items: center;
@@ -130,14 +123,14 @@
   height: 40px;
   border-radius: 50%;
   background-color: white;
-  color: var(--color-primary); /* Cor do texto da inicial volta a ser azul */
+  color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
   font-size: 18px;
   transition: transform 0.2s;
-  border: 2px solid rgba(255, 255, 255, 0.5); /* Borda branca sutil */
+  border: 2px solid rgba(255, 255, 255, 0.5);
 }
 .profileLink:hover .profileCircle {
   transform: scale(1.1);
@@ -148,22 +141,39 @@
   display: none;
   background: none;
   border: none;
-  color: white; /* Cor do ícone hambúrguer volta a ser branco */
+  color: white;
   cursor: pointer;
   z-index: 1001;
 }
-
-
+.overlay {
+  display: none;
+}
+.mobileMenu {
+  display: none;
+}
 
 /* --- ESTILOS DE RESPONSIVIDADE --- */
 @media (max-width: 1024px) {
-  .nav, .rightSection {
+  .nav,
+  .rightSection,
+  .centerSection {
     display: none;
   }
+
   .hamburgerButton {
     display: block;
+    position: relative;
     z-index: 2001;
   }
+
+  .logoLink {
+    z-index: 2002;
+  }
+
+  .container {
+    justify-content: space-between;
+  }
+
   .overlay {
     display: block;
     position: fixed;
@@ -171,12 +181,18 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
     pointer-events: none;
   }
+
+  .header ~ .overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .mobileMenu {
     display: flex;
     flex-direction: column;
@@ -185,7 +201,6 @@
     right: 0;
     width: 300px;
     height: 100%;
-    /* O menu móvel também ganha o efeito */
     background: linear-gradient(180deg, rgba(13, 110, 253, 0.95), rgba(10, 88, 202, 0.95));
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -195,31 +210,45 @@
     transition: transform 0.3s ease-in-out;
     z-index: 2000;
   }
+
   .mobileMenuOpen {
     transform: translateX(0);
   }
-  .header ~ .overlay { /* O ~ seleciona o irmão */
-    opacity: 1;
-    pointer-events: auto;
-  }
+
   .mobileNav {
     display: flex;
     flex-direction: column;
     gap: 0;
     width: 100%;
   }
+
   .mobileNav .navLink {
     padding: 16px;
     color: rgba(255, 255, 255, 0.8);
     border-bottom: none;
   }
+
   .mobileNav .navLink:hover {
     background-color: rgba(255, 255, 255, 0.1);
   }
+
   .mobileNav .navLink.active {
     color: white;
     background-color: rgba(255, 255, 255, 0.1);
   }
+
+  .mobileMonthSelector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 6px;
+    border-radius: var(--border-radius);
+    margin-top: 16px;
+    margin-bottom: 24px;
+  }
+
   .mobileActions {
     display: flex;
     flex-direction: column;
@@ -227,12 +256,15 @@
     width: 100%;
     margin-top: auto;
   }
+
   .mobileDivider {
     border: none;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     margin: 16px 0;
   }
-  .mobileProfileLink, .mobileButton {
+
+  .mobileProfileLink,
+  .mobileButton {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -248,7 +280,9 @@
     text-align: left;
     width: 100%;
   }
-  .mobileProfileLink:hover, .mobileButton:hover {
+
+  .mobileProfileLink:hover,
+  .mobileButton:hover {
     background-color: rgba(255, 255, 255, 0.1);
   }
 }

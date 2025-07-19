@@ -13,14 +13,8 @@ export const Header = () => {
   const { currentDate, changeMonth, copyPreviousMonth } = useData();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Efeito para impedir o scroll da página quando o menu estiver aberto
   useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-    // Função de limpeza
+    document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
     return () => {
       document.body.style.overflow = 'auto';
     };
@@ -56,7 +50,7 @@ export const Header = () => {
               </button>
             </div>
           </div>
-          
+
           <div className={styles.rightSection}>
             <button onClick={copyPreviousMonth} className={styles.iconButton} title="Copiar dados do mês anterior">
               <Copy size={18} />
@@ -76,15 +70,25 @@ export const Header = () => {
         </div>
       </header>
 
-      {/* Overlay que aparece com o menu mobile */}
       {isMenuOpen && <div className={styles.overlay} onClick={handleCloseMenu}></div>}
-      
-      {/* O menu em si */}
+
       <div className={`${styles.mobileMenu} ${isMenuOpen ? styles.mobileMenuOpen : ''}`}>
         <nav className={styles.mobileNav}>
           <NavLink to="/" className={navLinkClass} end onClick={handleCloseMenu}>Dashboard</NavLink>
           <NavLink to="/cofrinhos" className={navLinkClass} onClick={handleCloseMenu}>Cofrinhos</NavLink>
+
+          {/* Mês dentro do menu mobile */}
+          <div className={styles.mobileMonthSelector}>
+            <button onClick={() => changeMonth('prev')} className={styles.monthButton}>
+              <ChevronLeft size={20} />
+            </button>
+            <span className={styles.monthText}>{format(currentDate, 'MMMM yyyy', { locale: ptBR })}</span>
+            <button onClick={() => changeMonth('next')} className={styles.monthButton}>
+              <ChevronRight size={20} />
+            </button>
+          </div>
         </nav>
+
         <div className={styles.mobileActions}>
           <hr className={styles.mobileDivider} />
           <Link to="/perfil" className={styles.mobileProfileLink} onClick={handleCloseMenu}>
