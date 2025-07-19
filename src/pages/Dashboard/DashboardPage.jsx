@@ -6,19 +6,21 @@ import { TransactionModal } from '../../components/TransactionModal/TransactionM
 import { ReportsSection } from '../../components/ReportsSection/ReportsSection';
 import { useAuth } from '../../hooks/useAuth';
 import { useData } from '../../contexts/DataContext';
+import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
 import styles from './DashboardPage.module.css';
+import toast from 'react-hot-toast';
 
 export const DashboardPage = () => {
-  // --- HOOKS E CONTEXTOS ---
   const { user } = useAuth();
   const { monthlyData, loading, addTransaction, updateTransaction, deleteTransaction } = useData();
   
-  // Estado para controlar o modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionToEdit, setTransactionToEdit] = useState(null);
   const [modalType, setModalType] = useState('entradas');
 
-  // --- CÁLCULOS PARA OS CARDS DE RESUMO ---
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
   const summary = useMemo(() => {
     if (!monthlyData) {
       return { totalEntradasPrevisto: 0, totalEntradasReal: 0, totalSaidasPrevisto: 0, totalSaidasReal: 0, saldoInicial: 0, caixaFinalReal: 0, caixaFinalPrevisto: 0, entradasProgress: 0, saidasProgress: 0 };
@@ -37,11 +39,9 @@ export const DashboardPage = () => {
     return { totalEntradasPrevisto, totalEntradasReal, totalSaidasPrevisto, totalSaidasReal, saldoInicial, caixaFinalReal, caixaFinalPrevisto, entradasProgress, saidasProgress };
   }, [monthlyData]);
 
-  // --- CÁLCULOS PARA OS INSIGHTS E SAUDAÇÃO ---
   const insights = useMemo(() => {
     if (!monthlyData || !user) return { userName: '', biggestExpense: null, biggestIncome: null };
 
-    // Usa o displayName, se não existir, usa a parte do email antes do '@'
     const userName = user.displayName ? user.displayName.split(' ')[0] : (user.email.split('@')[0] || '');
     const capitalizedUserName = userName.charAt(0).toUpperCase() + userName.slice(1);
 
@@ -56,7 +56,6 @@ export const DashboardPage = () => {
     return { userName: capitalizedUserName, biggestExpense, biggestIncome };
   }, [monthlyData, user]);
 
-  // --- FUNÇÕES AUXILIARES E HANDLERS ---
   const formatCurrency = (value) => (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const handleOpenModal = (type, transaction = null) => {
@@ -80,10 +79,18 @@ export const DashboardPage = () => {
     handleCloseModal();
   };
   
-  const handleDeleteTransaction = async (type, transactionId) => {
-    if (window.confirm("Tem certeza que deseja excluir esta transação?")) {
-      await deleteTransaction(type, transactionId);
+  const handleDeleteTransaction = (type, transactionId) => {
+    setDeleteTarget({ type, id: transactionId });
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteTarget) {
+      await deleteTransaction(deleteTarget.type, deleteTarget.id);
+      toast.success("Transação excluída com sucesso!");
     }
+    setIsConfirmModalOpen(false);
+    setDeleteTarget(null);
   };
 
   const handleToggleConfirm = async (type, transaction) => {
@@ -96,7 +103,6 @@ export const DashboardPage = () => {
     await updateTransaction(type, updatedTransaction);
   };
 
-  // --- RENDERIZAÇÃO ---
   if (loading) {
     return (
       <div className={styles.dashboard}>
@@ -179,6 +185,14 @@ export const DashboardPage = () => {
         onSave={handleSaveTransaction}
         transactionToEdit={transactionToEdit}
         type={modalType}
+      />
+
+      <ConfirmModal 
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Confirmar Exclusão"
+        message="Você tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita."
       />
     </div>
   );

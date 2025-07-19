@@ -27,14 +27,12 @@ export const Header = () => {
           </Link>
         </div>
 
-        {/* --- O CONTAINER DO MENU MÓVEL AGORA INCLUI AS AÇÕES --- */}
         <div className={`${styles.navWrapper} ${isMenuOpen ? styles.navOpen : ''}`}>
           <nav className={styles.nav}>
             <NavLink to="/" className={navLinkClass} end onClick={handleCloseMenu}>Dashboard</NavLink>
             <NavLink to="/cofrinhos" className={navLinkClass} onClick={handleCloseMenu}>Cofrinhos</NavLink>
           </nav>
           
-          {/* --- AÇÕES DUPLICADAS, APENAS PARA O MENU MÓVEL --- */}
           <div className={styles.mobileActions}>
             <hr className={styles.mobileDivider} />
             <Link to="/perfil" className={styles.mobileProfileLink} onClick={handleCloseMenu}>
@@ -64,7 +62,6 @@ export const Header = () => {
           </div>
         </div>
         
-        {/* ESTA SEÇÃO AGORA SÓ APARECE NO DESKTOP */}
         <div className={styles.rightSection}>
           <button onClick={copyPreviousMonth} className={styles.iconButton} title="Copiar dados do mês anterior">
             <Copy size={18} />

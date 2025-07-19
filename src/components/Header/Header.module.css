@@ -20,6 +20,8 @@
   display: flex;
   align-items: center;
   gap: 40px;
+  flex: 1; /* Ocupa 1/3 do espaço */
+  justify-content: flex-start;
 }
 .logoLink {
   text-decoration: none;
@@ -32,8 +34,6 @@
 }
 .navWrapper {
   display: flex;
-  flex-grow: 1;
-  justify-content: center;
 }
 .nav {
   display: flex;
@@ -56,7 +56,9 @@
   border-bottom-color: white;
 }
 .centerSection {
-  /* Estilos para desktop */
+  flex: 1; /* Ocupa 1/3 do espaço */
+  display: flex;
+  justify-content: center;
 }
 .monthSelector {
   display: flex;
@@ -90,8 +92,10 @@
   background-color: rgba(255, 255, 255, 0.2);
 }
 .rightSection {
+  flex: 1; /* Ocupa 1/3 do espaço */
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 16px;
 }
 .iconButton {
@@ -107,9 +111,7 @@
   cursor: pointer;
   transition: all 0.2s;
 }
-.iconButtonText {
-  /* Este span será escondido no móvel */
-}
+.iconButtonText {}
 .iconButton:hover {
   background-color: rgba(255, 255, 255, 0.1);
   border-color: white;
@@ -137,7 +139,6 @@
 .profileLink:hover .profileCircle {
   transform: scale(1.1);
 }
-
 .hamburgerButton {
   display: none;
   background: none;
@@ -146,15 +147,16 @@
   cursor: pointer;
   z-index: 1001;
 }
-
-/* Esconde as ações móveis por padrão */
 .mobileActions {
   display: none;
 }
 
-/* --- ESTILOS DE RESPONSIVIDADE --- */
 @media (max-width: 1024px) {
-  .navWrapper {
+  .navWrapper, .rightSection {
+    display: none;
+  }
+  .navWrapper.navOpen {
+    display: flex;
     position: absolute;
     top: 72px;
     left: 0;
@@ -162,17 +164,13 @@
     background: var(--gradient-primary);
     box-shadow: var(--shadow-md);
     padding: 24px;
-    transform: translateY(-150%);
-    transition: transform 0.3s ease-in-out;
-    display: flex;
-    flex-direction: column; /* Organiza os itens do menu */
-  }
-  .navOpen {
     transform: translateY(0);
+    transition: transform 0.3s ease-in-out;
+    flex-direction: column;
   }
   .nav {
     flex-direction: column;
-    align-items: flex-start; /* Alinha links à esquerda */
+    align-items: flex-start;
     gap: 0;
     width: 100%;
   }
@@ -190,20 +188,15 @@
     display: block;
   }
   .leftSection {
-    flex-grow: 1;
-    justify-content: flex-start;
+    flex: 1;
   }
   .centerSection {
-    position: absolute; /* Permite que o seletor de mês fique centralizado sem empurrar outros itens */
-    left: 50%;
-    transform: translateX(-50%);
+    flex: 2; /* Dá mais espaço para o seletor de mês */
   }
-  /* ESCONDE A SESSÃO DA DIREITA NO DESKTOP */
   .rightSection {
-    display: none;
+    flex: 1;
+    justify-content: flex-end;
   }
-
-  /* MOSTRA E ESTILIZA AS AÇÕES NO MENU MÓVEL */
   .mobileActions {
     display: flex;
     flex-direction: column;
@@ -247,11 +240,20 @@
   }
 }
 
-@media (max-width: 640px) {
-  .header {
-    padding: 0 16px;
-  }
-  .centerSection {
-    display: none;
-  }
+@media (max-width: 768px) {
+    .navWrapper {
+      justify-content: flex-start;
+    }
+    .centerSection {
+        display: none;
+    }
+    .rightSection {
+        display: none;
+    }
+    .leftSection {
+        flex: unset;
+    }
+    .container {
+        justify-content: space-between;
+    }
 }

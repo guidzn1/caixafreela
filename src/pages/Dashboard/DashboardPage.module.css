@@ -32,11 +32,14 @@
   gap: 16px;
   margin-top: 32px;
 }
+
+/* --- CORREÇÃO AQUI --- */
 .insightCard {
   background-color: var(--color-surface);
   padding: 16px;
   border-radius: var(--border-radius);
   border: 1px solid #e2e8f0;
+  min-width: 0; /* Permite que o card encolha */
 }
 .insightCard strong {
   display: block;
@@ -48,7 +51,10 @@
   font-size: 16px;
   font-weight: 500;
   color: var(--text-primary);
+  word-break: break-word; /* Força a quebra de textos longos */
 }
+/* --- FIM DA CORREÇÃO --- */
+
 
 .cardsContainer {
   display: grid;
@@ -63,7 +69,6 @@
   margin-bottom: 32px;
 }
 
-/* Estilo base para AMBOS os botões */
 .quickActions button {
   flex-grow: 1;
   padding: 16px;
@@ -80,20 +85,17 @@
 }
 
 .quickActions button:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
-/* Estilo específico para o botão de ENTRADA */
 .actionButtonEntrada {
   background-color: var(--color-success);
   color: white;
 }
 
-/* --- ESTA É A CORREÇÃO --- */
-/* Estilo específico para o botão de SAÍDA */
 .actionButtonSaida {
-  background-color: var(--color-danger); /* Corrigido para vermelho */
+  background-color: var(--color-danger);
   color: white;
 }
 
@@ -105,10 +107,23 @@
 }
 
 @media (max-width: 900px) {
+  .mainContent {
+    padding: 24px 16px;
+  }
+  .cardsContainer {
+    grid-template-columns: 1fr 1fr;
+  }
   .tablesGrid {
     grid-template-columns: 1fr;
+    gap: 24px;
   }
-  .mainContent {
-    padding: 16px;
+  .quickActions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardsContainer {
+    grid-template-columns: 1fr;
   }
 }

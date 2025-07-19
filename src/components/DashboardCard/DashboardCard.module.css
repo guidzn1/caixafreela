@@ -5,10 +5,11 @@
   box-shadow: var(--shadow-md);
   flex: 1;
   min-width: 220px;
-  transition: all 0.2s ease-in-out; /* EFEITO DE TRANSIÇÃO */
+  transition: all 0.2s ease-in-out;
+  display: flex; /* Adicionado para melhor controle interno */
+  flex-direction: column; /* Adicionado para melhor controle interno */
 }
 
-/* EFEITO DE HOVER */
 .card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 16px rgba(0,0,0,0.1);
@@ -20,15 +21,21 @@
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
+
 .value {
   font-size: 28px;
   font-weight: 700;
   color: var(--text-primary);
+  /* --- CORREÇÃO AQUI --- */
+  word-break: break-all; /* Permite que números muito grandes quebrem a linha */
 }
+
 .detail {
   font-size: 14px;
   color: var(--text-secondary);
   margin-top: 4px;
+  /* --- CORREÇÃO AQUI --- */
+  word-break: break-word; /* Permite que o texto de detalhe quebre a linha */
 }
 .progressContainer {
   width: 100%;
@@ -36,7 +43,8 @@
   border-radius: var(--border-radius);
   height: 8px;
   overflow: hidden;
-  margin-top: 12px;
+  margin-top: auto; /* Empurra a barra para o final do card */
+  padding-top: 12px; /* Espaçamento entre o detalhe e a barra */
 }
 .progressBar {
   height: 100%;
