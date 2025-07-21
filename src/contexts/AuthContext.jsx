@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { 
   onAuthStateChanged, 
   createUserWithEmailAndPassword, 
@@ -25,20 +25,53 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Adicionamos um timer para garantir que a animação seja visível
     const timer = setTimeout(() => {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         setUser(user);
         setLoading(false);
       });
-      // A função de limpeza do onAuthStateChanged agora está dentro do timer
       return () => unsubscribe();
-    }, 1500); // 1.5 segundos
+    }, 1500);
 
-    // Limpa o timer se o componente for desmontado
     return () => clearTimeout(timer);
   }, []);
 
+  const logout = useCallback(() => {
+    toast.promise(
+      signOut(auth),
+      {
+        loading: 'A terminar a sessão...',
+        success: 'Sessão terminada com sucesso!',
+        error: 'Ocorreu um erro ao sair.',
+      }
+    );
+  }, []);
+
+  useEffect(() => {
+    let logoutTimer;
+
+    const resetTimer = () => {
+      clearTimeout(logoutTimer);
+      logoutTimer = setTimeout(() => {
+        if (auth.currentUser) {
+          toast.error("Sessão expirada por inatividade.");
+          logout();
+        }
+      }, 30 * 60 * 1000); // 30 minutos
+    };
+
+    if (user) {
+      const events = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
+      resetTimer();
+      events.forEach(event => window.addEventListener(event, resetTimer));
+
+      return () => {
+        clearTimeout(logoutTimer);
+        events.forEach(event => window.removeEventListener(event, resetTimer));
+      };
+    }
+  }, [user, logout]);
+  
   const signup = async (email, password, name) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -53,17 +86,6 @@ export const AuthProvider = ({ children }) => {
 
   const login = (email, password) => {
     return signInWithEmailAndPassword(auth, email, password);
-  };
-
-  const logout = () => {
-    toast.promise(
-      signOut(auth),
-      {
-        loading: 'A terminar a sessão...',
-        success: 'Sessão terminada com sucesso!',
-        error: 'Ocorreu um erro ao sair.',
-      }
-    );
   };
 
   const updateUserPassword = async (currentPassword, newPassword) => {
