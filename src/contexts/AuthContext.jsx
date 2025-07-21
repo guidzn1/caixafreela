@@ -14,6 +14,7 @@ import {
 import { auth, db } from '../firebase/config';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
+import { LoadingScreen } from '../components/LoadingScreen/LoadingScreen';
 
 export const AuthContext = createContext();
 
@@ -24,11 +25,18 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
-    return () => unsubscribe();
+    // Adicionamos um timer para garantir que a animação seja visível
+    const timer = setTimeout(() => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        setUser(user);
+        setLoading(false);
+      });
+      // A função de limpeza do onAuthStateChanged agora está dentro do timer
+      return () => unsubscribe();
+    }, 1500); // 1.5 segundos
+
+    // Limpa o timer se o componente for desmontado
+    return () => clearTimeout(timer);
   }, []);
 
   const signup = async (email, password, name) => {
@@ -97,7 +105,7 @@ export const AuthProvider = ({ children }) => {
   };
   
   if (loading) {
-    return <div>Carregando aplicação...</div>;
+    return <LoadingScreen />;
   }
 
   return (

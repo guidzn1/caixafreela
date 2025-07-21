@@ -1,0 +1,36 @@
+/* 1. Definimos a animação */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+/* 2. Estilizamos o container e aplicamos a animação ao logo */
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--color-background);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+.logo {
+  width: 280px;
+  height: auto;
+  /* Aplica a animação 'pulse' que definimos acima */
+  animation: pulse 1.8s infinite ease-in-out;
+}

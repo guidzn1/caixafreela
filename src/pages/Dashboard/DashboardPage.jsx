@@ -7,6 +7,7 @@ import { ReportsSection } from '../../components/ReportsSection/ReportsSection';
 import { useAuth } from '../../hooks/useAuth';
 import { useData } from '../../contexts/DataContext';
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
+import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen'; // <-- A LINHA QUE FALTAVA
 import styles from './DashboardPage.module.css';
 import toast from 'react-hot-toast';
 
@@ -22,8 +23,6 @@ export const DashboardPage = () => {
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const summary = useMemo(() => {
-    console.log(`%c4. [DashboardPage] O monthlyData mudou! A recalcular o resumo...`, 'color: green; font-weight: bold;', monthlyData);
-
     if (!monthlyData) {
       return { totalEntradasPrevisto: 0, totalEntradasReal: 0, totalSaidasPrevisto: 0, totalSaidasReal: 0, saldoInicial: 0, caixaFinalReal: 0, caixaFinalPrevisto: 0, entradasProgress: 0, saidasProgress: 0 };
     }
@@ -37,8 +36,6 @@ export const DashboardPage = () => {
     const caixaFinalPrevisto = saldoInicial + totalEntradasPrevisto - totalSaidasPrevisto;
     const entradasProgress = totalEntradasPrevisto > 0 ? (totalEntradasReal / totalEntradasPrevisto) * 100 : 0;
     const saidasProgress = totalSaidasPrevisto > 0 ? (totalSaidasReal / totalSaidasPrevisto) * 100 : 0;
-
-    console.log(`%c5. [DashboardPage] Novo progresso calculado: ${entradasProgress}%`, 'color: green; font-weight: bold;');
 
     return { totalEntradasPrevisto, totalEntradasReal, totalSaidasPrevisto, totalSaidasReal, saldoInicial, caixaFinalReal, caixaFinalPrevisto, entradasProgress, saidasProgress };
   }, [monthlyData]);
@@ -57,15 +54,18 @@ export const DashboardPage = () => {
   }, [monthlyData, user]);
 
   const formatCurrency = (value) => (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
   const handleOpenModal = (type, transaction = null) => {
     setModalType(type);
     setTransactionToEdit(transaction);
     setIsModalOpen(true);
   };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setTransactionToEdit(null);
   };
+
   const handleSaveTransaction = async (type, transactionData) => {
     const dataComTimestamp = { ...transactionData, updatedAt: new Date().toISOString() };
     if (transactionData.id) {
@@ -75,10 +75,12 @@ export const DashboardPage = () => {
     }
     handleCloseModal();
   };
+  
   const handleDeleteTransaction = (type, transactionId) => {
     setDeleteTarget({ type, id: transactionId });
     setIsConfirmModalOpen(true);
   };
+
   const handleConfirmDelete = async () => {
     if (deleteTarget) {
       await deleteTransaction(deleteTarget.type, deleteTarget.id);
@@ -89,15 +91,11 @@ export const DashboardPage = () => {
   };
 
   const handleToggleConfirm = async (type, transaction) => {
-    const isConfirming = !transaction.confirmado;
-    let newValorReal = transaction.valorReal;
-    if (isConfirming && (!newValorReal || newValorReal === 0)) {
-      newValorReal = transaction.valorPrevisto;
+    const updatedTransaction = { ...transaction };
+    updatedTransaction.confirmado = !transaction.confirmado;
+    if (updatedTransaction.confirmado && (!transaction.valorReal || transaction.valorReal === 0)) {
+      updatedTransaction.valorReal = transaction.valorPrevisto;
     }
-    const updatedTransaction = { ...transaction, confirmado: isConfirming, valorReal: newValorReal };
-    
-    console.log(`%c1. [DashboardPage] Cliquei no checkbox. Vou enviar esta transação atualizada:`, 'color: orange; font-weight: bold;', updatedTransaction);
-
     await updateTransaction(type, updatedTransaction);
   };
 
@@ -106,11 +104,24 @@ export const DashboardPage = () => {
       <div className={styles.dashboard}>
         <Header />
         <main className={styles.mainContent}>
-          <p>Carregando seus dados financeiros...</p>
+          <LoadingScreen />
         </main>
       </div>
     );
   }
+  
+  const sortTransactions = (transactions) => {
+    if (!transactions) return [];
+    return [...transactions].sort((a, b) => {
+      if (a.confirmado !== b.confirmado) {
+        return a.confirmado - b.confirmado;
+      }
+      return new Date(b.data) - new Date(a.data);
+    });
+  };
+
+  const sortedEntradas = sortTransactions(monthlyData?.entradas);
+  const sortedSaidas = sortTransactions(monthlyData?.saidas);
 
   return (
     <div className={styles.dashboard}>
@@ -170,8 +181,8 @@ export const DashboardPage = () => {
         </div>
 
         <div className={styles.tablesGrid}>
-          <TransactionsTable title="Entradas" data={monthlyData?.entradas} type="entradas" onAdd={handleOpenModal} onEdit={handleOpenModal} onDelete={handleDeleteTransaction} onToggleConfirm={handleToggleConfirm} />
-          <TransactionsTable title="Saídas" data={monthlyData?.saidas} type="saidas" onAdd={handleOpenModal} onEdit={handleOpenModal} onDelete={handleDeleteTransaction} onToggleConfirm={handleToggleConfirm} />
+          <TransactionsTable title="Entradas" data={sortedEntradas} type="entradas" onAdd={handleOpenModal} onEdit={handleOpenModal} onDelete={handleDeleteTransaction} onToggleConfirm={handleToggleConfirm} />
+          <TransactionsTable title="Saídas" data={sortedSaidas} type="saidas" onAdd={handleOpenModal} onEdit={handleOpenModal} onDelete={handleDeleteTransaction} onToggleConfirm={handleToggleConfirm} />
         </div>
         
         <ReportsSection />
