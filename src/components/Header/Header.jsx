@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useData } from '../../contexts/DataContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Link, NavLink } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Copy, LogOut, User, Menu, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Copy, LogOut, User, Menu, X, Sun, Moon } from 'lucide-react';
 import styles from './Header.module.css';
 import logoImg from '../../assets/logo.png';
 
 export const Header = () => {
   const { user, logout } = useAuth();
   const { currentDate, changeMonth, copyPreviousMonth } = useData();
+  const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -52,6 +54,9 @@ export const Header = () => {
           </div>
 
           <div className={styles.rightSection}>
+            <button onClick={toggleTheme} className={styles.themeToggleButton} title="Alterar tema">
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
             <button onClick={copyPreviousMonth} className={styles.iconButton} title="Copiar dados do mês anterior">
               <Copy size={18} />
               <span className={styles.iconButtonText}>Copiar Mês</span>
@@ -76,17 +81,6 @@ export const Header = () => {
         <nav className={styles.mobileNav}>
           <NavLink to="/" className={navLinkClass} end onClick={handleCloseMenu}>Dashboard</NavLink>
           <NavLink to="/cofrinhos" className={navLinkClass} onClick={handleCloseMenu}>Cofrinhos</NavLink>
-
-          {/* Mês dentro do menu mobile */}
-          <div className={styles.mobileMonthSelector}>
-            <button onClick={() => changeMonth('prev')} className={styles.monthButton}>
-              <ChevronLeft size={20} />
-            </button>
-            <span className={styles.monthText}>{format(currentDate, 'MMMM yyyy', { locale: ptBR })}</span>
-            <button onClick={() => changeMonth('next')} className={styles.monthButton}>
-              <ChevronRight size={20} />
-            </button>
-          </div>
         </nav>
 
         <div className={styles.mobileActions}>
@@ -95,6 +89,10 @@ export const Header = () => {
             <div className={styles.profileCircle}>{userInitial}</div>
             <span>{user?.displayName || user?.email}</span>
           </Link>
+          <button onClick={() => { toggleTheme(); handleCloseMenu(); }} className={styles.mobileButton}>
+            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+            <span>Alterar para Tema {theme === 'light' ? 'Escuro' : 'Claro'}</span>
+          </button>
           <button onClick={() => { copyPreviousMonth(); handleCloseMenu(); }} className={styles.mobileButton}>
             <Copy size={18} />
             <span>Copiar Mês Anterior</span>

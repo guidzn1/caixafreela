@@ -238,3 +238,31 @@
 .googleButton:hover {
   background-color: #f8f8f8;
 }
+/* ... (maioria do código sem alteração) ... */
+.inputGroup input {
+  width: 100%;
+}
+.error {
+  color: var(--color-danger);
+  margin-bottom: 16px;
+  background-color: rgba(220, 53, 69, 0.1); /* Fundo de erro suave */
+  padding: 10px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-danger);
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--color-border); /* USA VARIÁVEL */
+}
+.googleButton {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--color-surface); /* USA VARIÁVEL */
+  color: var(--text-primary); /* USA VARIÁVEL */
+  border: 1px solid var(--color-border); /* USA VARIÁVEL */
+  /* ... (resto dos estilos do botão) */
+}
+.googleButton:hover {
+  background-color: var(--color-surface-hover); /* USA VARIÁVEL */
+}

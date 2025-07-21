@@ -286,3 +286,30 @@
     background-color: rgba(255, 255, 255, 0.1);
   }
 }
+/* Adicione este estilo ao seu ficheiro Header.module.css */
+.themeToggleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: var(--text-primary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.themeToggleButton:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: rotate(15deg);
+}
+
+/* Garante que os ícones fiquem com a cor certa no header com gradiente */
+.header .themeToggleButton {
+  color: white;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.header .themeToggleButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}

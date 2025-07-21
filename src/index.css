@@ -1,12 +1,12 @@
-/* Definindo variáveis de cor para usar em todo o projeto */
+/* :root define as variáveis para o tema claro (padrão) */
 :root {
-  --color-background: #f4f7fa; /* Um cinza azulado mais suave */
-  --color-surface: #FFFFFF;
-  
-  /* O nosso novo gradiente! */
-  --gradient-primary: linear-gradient(45deg, #0d6efd, #0a58ca);
-  --color-primary: #0d6efd; /* Mantemos uma cor sólida como fallback */
+  --color-background: #f4f7fa;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+  --color-surface-hover: #f8f9fa;
 
+  --gradient-primary: linear-gradient(45deg, #0d6efd, #0a58ca);
+  --color-primary: #0d6efd;
   --color-success: #198754;
   --color-danger: #dc3545;
   --color-highlight: #6F42C1;
@@ -19,7 +19,26 @@
   --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-/* Reset básico e fontes */
+/* Paleta para o tema escuro */
+[data-theme='dark'] {
+  --color-background: #0d1117;
+  --color-surface: #161b22;
+  --color-border: #30363d;
+  --color-surface-hover: #21262d;
+
+  --gradient-primary: linear-gradient(45deg, #1f6feb, #2f81f7);
+  --color-primary: #2f81f7;
+  --color-success: #2ea043;
+  --color-danger: #f85149;
+  --color-highlight: #a371f7;
+
+  --text-primary: #c9d1d9;
+  --text-secondary: #8b949e;
+  
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -30,7 +49,47 @@ body {
   font-family: 'Inter', sans-serif;
   background-color: var(--color-background);
   color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
 }
 
-/* Importando a fonte Inter do Google Fonts */
+/* Estilos globais para formulários */
+input,
+select,
+textarea {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: 12px;
+  font-size: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  color-scheme: light dark;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+/* Estilo para Checkboxes nos dois temas */
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+/* Correção para Inputs de Número no Modo Escuro */
+[data-theme='dark'] input[type="number"]::-webkit-inner-spin-button,
+[data-theme='dark'] input[type="number"]::-webkit-outer-spin-button {
+  filter: invert(1);
+}
+[data-theme='dark'] input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');

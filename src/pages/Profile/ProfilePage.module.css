@@ -22,7 +22,7 @@
 
 .profileContainer h2, .reportContainer h2 {
   margin-bottom: 24px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 16px;
   font-size: 22px;
 }
@@ -50,34 +50,32 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .inputGroup input {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: var(--border-radius);
-  font-size: 16px;
+  /* Estilos de input agora vêm do index.css global */
 }
 
 .saveButton {
-  background-color: var(--color-primary);
+  background: var(--gradient-primary); /* Gradiente para o botão */
   color: white;
   border: none;
   padding: 12px 20px;
   border-radius: var(--border-radius);
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: filter 0.2s;
 }
 
 .saveButton:hover {
-  background-color: #0056b3;
+  filter: brightness(1.1);
 }
 
 .divider {
   border: none;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border);
   margin: 24px 0;
 }
 
@@ -102,8 +100,9 @@
 }
 
 .yearSelector button {
-  background-color: #f1f1f1;
-  border: none;
+  background-color: var(--color-background);
+  color: var(--text-primary);
+  border: 1px solid var(--color-border);
   border-radius: 50%;
   width: 36px;
   height: 36px;
@@ -116,7 +115,7 @@
 }
 
 .yearSelector button:hover {
-    background-color: #e2e2e2;
+    background-color: var(--color-surface-hover);
 }
 
 .totalCard {
@@ -154,7 +153,7 @@
   padding: 8px 12px;
   border-radius: 16px;
   font-weight: 500;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   transition: all 0.2s;
 }
 
@@ -184,29 +183,17 @@
   display: flex;
   gap: 12px;
   margin-top: 16px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border);
   padding-top: 24px;
 }
 
-/* --- ESTILOS CORRIGIDOS E MELHORADOS PARA O INPUT --- */
 .addCategoryForm input {
   flex-grow: 1;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: var(--border-radius);
-  font-size: 16px;
-  transition: border-color 0.2s, box-shadow 0.2s; /* Para o efeito de foco */
+  /* Estilos de input agora vêm do index.css global */
 }
-
-.addCategoryForm input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25); /* Efeito de 'glow' azul */
-}
-/* --- FIM DA CORREÇÃO --- */
 
 .addCategoryForm button {
-  background-color: var(--color-primary);
+  background: var(--gradient-primary);
   color: white;
   border: none;
   padding: 0 24px;

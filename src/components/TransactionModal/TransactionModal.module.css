@@ -2,31 +2,29 @@
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0,0,0,0.6); /* Um pouco mais escuro para mais contraste */
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
-
-  /* --- MUDANÇAS PRINCIPAIS AQUI --- */
-  align-items: flex-start; /* Alinha o modal no topo em vez de no centro */
-  padding: 5vh 20px; /* Adiciona um espaçamento vertical e horizontal */
-  overflow-y: auto; /* A MÁGICA ACONTECE AQUI: Adiciona scroll se necessário */
-  z-index: 1000; /* Garante que o modal fique por cima de tudo */
+  align-items: center;
+  z-index: 1000;
 }
 
 .modal {
-  background: var(--color-surface);
+  background-color: var(--color-surface);
   padding: 32px;
   border-radius: var(--border-radius);
-  width: 100%;
-  max-width: 500px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  margin-bottom: 5vh; /* Garante espaço abaixo do modal ao rolar */
+  width: 90%;
+  max-width: 600px;
+  box-shadow: var(--shadow-md);
+  color: var(--text-primary);
 }
 
 .modal h2 {
   margin-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 16px;
 }
 
 .inputGroup {
@@ -37,77 +35,77 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .inputGroup input,
 .inputGroup select {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: var(--border-radius);
-  font-size: 16px;
-  background-color: white;
-}
-
-.buttonGroup {
-  margin-top: 32px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-}
-
-.cancelButton, .saveButton {
-  padding: 10px 20px;
-  border: none;
-  border-radius: var(--border-radius);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.cancelButton {
-  background-color: #e9ecef;
-  color: var(--text-secondary);
-}
-
-.saveButton {
-  background-color: var(--color-primary);
-  color: white;
+  /* Os estilos de background, border, padding, etc., agora vêm do index.css */
 }
 
 .checkboxGroup {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.checkboxGroup label {
-  font-weight: 500;
-  color: var(--text-secondary);
+  margin-bottom: 16px;
 }
 
 .checkboxGroup input {
-  width: 18px;
-  height: 18px;
+  margin-right: 8px;
 }
 
 .parcelamentoFields {
-  background-color: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: var(--border-radius);
-  padding: 16px;
   margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.parcelamentoFields .inputGroup {
+  margin-bottom: 16px;
 }
 
 .infoText {
-  font-size: 12px;
+  font-size: 0.9em;
   color: var(--text-secondary);
   margin-top: 8px;
-  text-align: center;
 }
-/* ... (todos os estilos existentes até .infoText) ... */
 
-/* --- NOVOS ESTILOS PARA A GESTÃO DE CATEGORIAS --- */
+.buttonGroup {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  margin-top: 32px;
+}
+
+.cancelButton, .saveButton {
+  padding: 10px 20px;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  transition: all 0.2s;
+}
+
+.cancelButton {
+  background-color: var(--color-surface-hover);
+  color: var(--text-primary);
+}
+
+.cancelButton:hover {
+  background-color: var(--color-border);
+}
+
+.saveButton {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+}
+
+.saveButton:hover {
+  filter: brightness(1.1);
+}
+
+/* --- Estilos para a criação de categoria (sem alterações de cor) --- */
 .selectCategoryWrapper, .createCategoryWrapper {
   display: flex;
   align-items: center;
@@ -115,7 +113,7 @@
 }
 
 .selectCategoryWrapper select {
-  flex-grow: 1; /* Faz o select ocupar o espaço disponível */
+  flex-grow: 1;
 }
 
 .addCategoryButton {
@@ -128,7 +126,7 @@
   font-size: 24px;
   line-height: 1;
   cursor: pointer;
-  flex-shrink: 0; /* Impede que o botão encolha */
+  flex-shrink: 0;
 }
 
 .createCategoryWrapper input {
@@ -136,20 +134,20 @@
 }
 
 .saveCategoryButton {
-  background-color: var(--color-primary);
+  background: var(--gradient-primary);
   color: white;
   border: none;
   padding: 0 16px;
-  height: 45px; /* Alinha com a altura do input */
+  height: 45px;
   border-radius: var(--border-radius);
   font-weight: 500;
   cursor: pointer;
 }
 
 .cancelCategoryButton {
-  background-color: #e9ecef;
-  color: var(--text-secondary);
-  border: none;
+  background-color: var(--color-surface-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--color-border);
   border-radius: 50%;
   width: 32px;
   height: 32px;
@@ -158,4 +156,7 @@
   line-height: 1;
   cursor: pointer;
   flex-shrink: 0;
+}
+.cancelCategoryButton:hover {
+  background-color: var(--color-border);
 }
