@@ -1,21 +1,24 @@
 import { useState, useEffect } from 'react';
+import { useData } from '../../contexts/DataContext';
 import styles from './TransactionModal.module.css';
+import toast from 'react-hot-toast';
 
-const CATEGORIAS_SAIDA = ['Moradia', 'Alimentação', 'Transporte', 'Ferramentas', 'Assinaturas', 'Saúde', 'Lazer', 'Outros'];
-
-export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, type }) => {
+export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, type, categorias = [] }) => {
   const [descricao, setDescricao] = useState('');
   const [valorPrevisto, setValorPrevisto] = useState('');
   const [valorReal, setValorReal] = useState('');
-  const [categoria, setCategoria] = useState(CATEGORIAS_SAIDA[0]);
+  const [categoria, setCategoria] = useState('');
   const [data, setData] = useState(new Date().toISOString().slice(0, 10));
   const [isRecorrente, setIsRecorrente] = useState(false);
   const [mesesRecorrencia, setMesesRecorrencia] = useState('12');
-  
   const [isParcelado, setIsParcelado] = useState(false);
   const [totalParcelas, setTotalParcelas] = useState('');
   const [parcelasPagas, setParcelasPagas] = useState('0');
 
+  const [modoCriacaoCategoria, setModoCriacaoCategoria] = useState(false);
+  const [novaCategoria, setNovaCategoria] = useState('');
+  
+  const { updateCategorias } = useData();
   const isEditing = !!transactionToEdit;
 
   useEffect(() => {
@@ -28,13 +31,13 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
         setIsRecorrente(transactionToEdit.isRecorrente || false);
         setIsParcelado(transactionToEdit.isParcelado || false);
         if (type === 'saidas') {
-          setCategoria(transactionToEdit.categoria || CATEGORIAS_SAIDA[0]);
+          setCategoria(transactionToEdit.categoria || (categorias.length > 0 ? categorias[0] : ''));
         }
       } else {
         setDescricao('');
         setValorPrevisto('');
         setValorReal('');
-        setCategoria(CATEGORIAS_SAIDA[0]);
+        setCategoria(categorias.length > 0 ? categorias[0] : '');
         setData(new Date().toISOString().slice(0, 10));
         setIsRecorrente(false);
         setMesesRecorrencia('12');
@@ -42,8 +45,10 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
         setTotalParcelas('');
         setParcelasPagas('0');
       }
+      setModoCriacaoCategoria(false);
+      setNovaCategoria('');
     }
-  }, [transactionToEdit, isOpen, isEditing, type]);
+  }, [transactionToEdit, isOpen, isEditing, type, categorias]);
 
   if (!isOpen) return null;
 
@@ -68,6 +73,20 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
     onSave(type, transactionData);
   };
 
+  const handleAddNewCategory = async () => {
+    if (!novaCategoria.trim()) return;
+    const trimmedCategory = novaCategoria.trim();
+    if (categorias.find(cat => cat.toLowerCase() === trimmedCategory.toLowerCase())) {
+      return toast.error("Essa categoria já existe.");
+    }
+    const newArray = [...categorias, trimmedCategory];
+    await updateCategorias(newArray);
+    setCategoria(trimmedCategory);
+    setNovaCategoria('');
+    setModoCriacaoCategoria(false);
+    toast.success("Categoria adicionada!");
+  };
+
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
@@ -89,12 +108,30 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
             <label>Valor Real (Pago/Recebido)</label>
             <input type="number" step="0.01" value={valorReal} onChange={(e) => setValorReal(e.target.value)} />
           </div>
+          
           {type === 'saidas' && (
             <div className={styles.inputGroup}>
               <label>Categoria</label>
-              <select value={categoria} onChange={(e) => setCategoria(e.target.value)}>
-                {CATEGORIAS_SAIDA.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-              </select>
+              {modoCriacaoCategoria ? (
+                <div className={styles.createCategoryWrapper}>
+                  <input 
+                    type="text" 
+                    value={novaCategoria} 
+                    onChange={(e) => setNovaCategoria(e.target.value)}
+                    placeholder="Nome da nova categoria"
+                    autoFocus
+                  />
+                  <button type="button" onClick={handleAddNewCategory} className={styles.saveCategoryButton}>Salvar</button>
+                  <button type="button" onClick={() => setModoCriacaoCategoria(false)} className={styles.cancelCategoryButton}>X</button>
+                </div>
+              ) : (
+                <div className={styles.selectCategoryWrapper}>
+                  <select value={categoria} onChange={(e) => setCategoria(e.target.value)}>
+                    {categorias.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                  </select>
+                  <button type="button" onClick={() => setModoCriacaoCategoria(true)} className={styles.addCategoryButton} title="Adicionar nova categoria">+</button>
+                </div>
+              )}
             </div>
           )}
           
@@ -110,7 +147,6 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
                 />
                 <label htmlFor="recorrente">É uma transação recorrente?</label>
               </div>
-
               {isRecorrente && (
                 <div className={styles.parcelamentoFields}>
                   <div className={styles.inputGroup}>
@@ -119,7 +155,6 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
                   </div>
                 </div>
               )}
-
               {type === 'saidas' && (
                 <div className={styles.checkboxGroup}>
                   <input 
@@ -132,7 +167,6 @@ export const TransactionModal = ({ isOpen, onClose, onSave, transactionToEdit, t
                   <label htmlFor="parcelado">É uma compra parcelada?</label>
                 </div>
               )}
-
               {isParcelado && type === 'saidas' && (
                 <div className={styles.parcelamentoFields}>
                   <div className={styles.inputGroup}>

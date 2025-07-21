@@ -58,7 +58,7 @@
 }
 
 /* --- SEÇÃO CENTRAL (SELETOR DE MÊS) --- */
-.centerSection {}
+
 .monthSelector {
   display: flex;
   align-items: center;

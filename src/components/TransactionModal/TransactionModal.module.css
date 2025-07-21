@@ -105,3 +105,57 @@
   margin-top: 8px;
   text-align: center;
 }
+/* ... (todos os estilos existentes até .infoText) ... */
+
+/* --- NOVOS ESTILOS PARA A GESTÃO DE CATEGORIAS --- */
+.selectCategoryWrapper, .createCategoryWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selectCategoryWrapper select {
+  flex-grow: 1; /* Faz o select ocupar o espaço disponível */
+}
+
+.addCategoryButton {
+  background-color: var(--color-success);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0; /* Impede que o botão encolha */
+}
+
+.createCategoryWrapper input {
+  flex-grow: 1;
+}
+
+.saveCategoryButton {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0 16px;
+  height: 45px; /* Alinha com a altura do input */
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.cancelCategoryButton {
+  background-color: #e9ecef;
+  color: var(--text-secondary);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}

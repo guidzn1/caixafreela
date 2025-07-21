@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { useData } from '../../contexts/DataContext';
 import { Header } from '../../components/Header/Header';
 import { AnnualReport } from '../../components/AnnualReport/AnnualReport';
 import styles from './ProfilePage.module.css';
 import toast from 'react-hot-toast';
 import { collection, query, where, getDocs, documentId } from 'firebase/firestore';
 import { db } from '../../firebase/config';
+import { X } from 'lucide-react';
 
 const getMonthName = (monthNumber) => {
   const date = new Date();
@@ -15,6 +17,7 @@ const getMonthName = (monthNumber) => {
 
 export const ProfilePage = () => {
   const { user, updateUserPassword } = useAuth();
+  const { categorias, updateCategorias } = useData();
   
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -24,6 +27,28 @@ export const ProfilePage = () => {
   const [annualData, setAnnualData] = useState([]);
   const [reportLoading, setReportLoading] = useState(true);
   const [annualTotal, setAnnualTotal] = useState(0);
+
+  const [newCategory, setNewCategory] = useState('');
+
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) return;
+    if (categorias.find(cat => cat.toLowerCase() === newCategory.toLowerCase())) {
+      return toast.error("Essa categoria já existe.");
+    }
+    const newArray = [...categorias, newCategory];
+    await updateCategorias(newArray);
+    setNewCategory('');
+    toast.success("Categoria adicionada!");
+  };
+
+  const handleDeleteCategory = async (categoryToDelete) => {
+    if (categorias.length <= 1) {
+        return toast.error("Você deve ter pelo menos uma categoria.");
+    }
+    const newArray = categorias.filter(cat => cat !== categoryToDelete);
+    await updateCategorias(newArray);
+    toast.success("Categoria removida!");
+  };
 
   useEffect(() => {
     const fetchAnnualData = async () => {
@@ -146,6 +171,27 @@ export const ProfilePage = () => {
             </div>
             <button type="submit" className={styles.saveButton}>Salvar Nova Senha</button>
           </form>
+        </div>
+        
+        <div className={styles.profileContainer}>
+          <h2>Gerir Categorias de Saída</h2>
+          <div className={styles.categoryList}>
+            {categorias.map(cat => (
+              <div key={cat} className={styles.categoryTag}>
+                <span>{cat}</span>
+                <button onClick={() => handleDeleteCategory(cat)} title={`Excluir categoria ${cat}`}><X size={14} /></button>
+              </div>
+            ))}
+          </div>
+          <div className={styles.addCategoryForm}>
+            <input 
+              type="text" 
+              value={newCategory} 
+              onChange={(e) => setNewCategory(e.target.value)}
+              placeholder="Nome da nova categoria"
+            />
+            <button onClick={handleAddCategory}>Adicionar</button>
+          </div>
         </div>
 
         <div className={styles.reportContainer}>

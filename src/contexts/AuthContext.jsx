@@ -20,6 +20,8 @@ export const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
+const DEFAULT_CATEGORIAS = ['Moradia', 'Alimentação', 'Transporte', 'Ferramentas', 'Assinaturas', 'Saúde', 'Lazer', 'Outros'];
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -57,7 +59,7 @@ export const AuthProvider = ({ children }) => {
           toast.error("Sessão expirada por inatividade.");
           logout();
         }
-      }, 30 * 60 * 1000); // 30 minutos
+      }, 30 * 60 * 1000);
     };
 
     if (user) {
@@ -76,11 +78,13 @@ export const AuthProvider = ({ children }) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     await updateProfile(user, { displayName: name });
+    
     await setDoc(doc(db, "users", user.uid), {
       uid: user.uid,
       displayName: name,
       email: user.email,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      categorias: DEFAULT_CATEGORIAS
     });
   };
 
@@ -111,7 +115,8 @@ export const AuthProvider = ({ children }) => {
         uid: user.uid,
         displayName: user.displayName,
         email: user.email,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        categorias: DEFAULT_CATEGORIAS
       });
     }
   };

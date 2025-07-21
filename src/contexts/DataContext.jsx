@@ -28,9 +28,11 @@ export const DataProvider = ({ children }) => {
   const [aiAnalysis, setAiAnalysis] = useState('');
   const [cofrinhos, setCofrinhos] = useState([]);
   const [cofrinhosLoading, setCofrinhosLoading] = useState(true);
+  const [categorias, setCategorias] = useState([]);
 
   const monthId = format(currentDate, 'yyyy-MM');
 
+  // useEffect para buscar dados MENSAIS
   useEffect(() => {
     if (!user) {
       setLoading(false);
@@ -42,16 +44,10 @@ export const DataProvider = ({ children }) => {
     const docRef = doc(db, 'users', user.uid, 'meses', monthId);
     
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      console.log(`%c6. [DataContext] O Firebase notificou uma mudança! A atualizar o estado...`, 'color: purple; font-weight: bold;', docSnap.data());
-      
       if (docSnap.exists()) {
         setMonthlyData(docSnap.data());
       } else {
-        const defaultData = {
-          entradas: [],
-          saidas: [],
-          saldoInicial: 0,
-        };
+        const defaultData = { entradas: [], saidas: [], saldoInicial: 0 };
         setDoc(docRef, defaultData);
         setMonthlyData(defaultData);
       }
@@ -61,6 +57,7 @@ export const DataProvider = ({ children }) => {
     return () => unsubscribe();
   }, [user, monthId]);
 
+  // useEffect para buscar os COFRINHOS
   useEffect(() => {
     if (!user) {
       setCofrinhos([]);
@@ -76,6 +73,21 @@ export const DataProvider = ({ children }) => {
       setCofrinhosLoading(false);
     });
 
+    return () => unsubscribe();
+  }, [user]);
+
+  // useEffect para buscar as CATEGORIAS
+  useEffect(() => {
+    if (!user) {
+      setCategorias([]);
+      return;
+    }
+    const userDocRef = doc(db, 'users', user.uid);
+    const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setCategorias(docSnap.data().categorias || []);
+      }
+    });
     return () => unsubscribe();
   }, [user]);
 
@@ -170,13 +182,9 @@ export const DataProvider = ({ children }) => {
   };
   
   const updateTransaction = async (type, updatedTransaction) => {
-    console.log(`%c2. [DataContext] Recebi o pedido para atualizar. Objeto:`, 'color: blue; font-weight: bold;', updatedTransaction);
-    
     const docRef = getDocRef();
     if (!docRef || !monthlyData) return;
     const updatedArray = monthlyData[type].map(t => t.id === updatedTransaction.id ? updatedTransaction : t);
-    
-    console.log(`%c3. [DataContext] Array atualizado pronto para ser salvo no Firebase:`, 'color: blue; font-weight: bold;', updatedArray);
     await updateDoc(docRef, { [type]: updatedArray });
   };
   
@@ -297,11 +305,21 @@ export const DataProvider = ({ children }) => {
       toast.error(`Falha na operação: ${e}`);
     }
   };
+  
+  const updateCategorias = async (newCategoriasArray) => {
+    if (!user) return;
+    const userDocRef = doc(db, 'users', user.uid);
+    await updateDoc(userDocRef, {
+      categorias: newCategoriasArray
+    });
+  };
 
   const value = {
     monthlyData, loading, currentDate, addTransaction, updateTransaction, deleteTransaction,
     updateSaldoInicial, aiAnalysis, isAiLoading, getFinancialAnalysis, changeMonth, copyPreviousMonth,
-    cofrinhos, cofrinhosLoading, addCofrinho, deleteCofrinho, updateCofrinhoValue
+    cofrinhos, cofrinhosLoading, addCofrinho, deleteCofrinho, updateCofrinhoValue,
+    categorias,
+    updateCategorias
   };
 
   return (

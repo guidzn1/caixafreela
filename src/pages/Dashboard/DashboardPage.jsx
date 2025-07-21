@@ -7,13 +7,20 @@ import { ReportsSection } from '../../components/ReportsSection/ReportsSection';
 import { useAuth } from '../../hooks/useAuth';
 import { useData } from '../../contexts/DataContext';
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
-import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen'; // <-- A LINHA QUE FALTAVA
+import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
 import styles from './DashboardPage.module.css';
 import toast from 'react-hot-toast';
 
 export const DashboardPage = () => {
   const { user } = useAuth();
-  const { monthlyData, loading, addTransaction, updateTransaction, deleteTransaction } = useData();
+  const { 
+    monthlyData, 
+    loading, 
+    addTransaction, 
+    updateTransaction, 
+    deleteTransaction,
+    categorias 
+  } = useData();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionToEdit, setTransactionToEdit] = useState(null);
@@ -194,6 +201,7 @@ export const DashboardPage = () => {
         onSave={handleSaveTransaction}
         transactionToEdit={transactionToEdit}
         type={modalType}
+        categorias={categorias}
       />
 
       <ConfirmModal 
