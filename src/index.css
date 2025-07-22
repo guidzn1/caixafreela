@@ -75,21 +75,39 @@ textarea:focus {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
 }
 
-/* Estilo para Checkboxes nos dois temas */
-input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: var(--color-primary);
-}
-
-/* Correção para Inputs de Número no Modo Escuro */
+/* --- Correção Agressiva para Inputs de Número no Modo Escuro --- */
 [data-theme='dark'] input[type="number"]::-webkit-inner-spin-button,
 [data-theme='dark'] input[type="number"]::-webkit-outer-spin-button {
   filter: invert(1);
 }
 [data-theme='dark'] input[type="number"] {
   -moz-appearance: textfield;
+}
+/* --- Fim da Correção --- */
+
+/* --- Customização dos <select> (remove arrow nativo e adiciona SVG) --- */
+/* Remove seta nativa */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 2rem;             /* espaço para o ícone */
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 0.65rem auto;
+}
+/* Esconde seta no Edge/IE */
+select::-ms-expand {
+  display: none;
+}
+
+/* Seta customizada para o tema escuro (aponta para baixo) */
+[data-theme='dark'] select {
+  background-color: var(--color-surface);
+  background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'>\
+  <path fill='%238B949E' d='M2 5L0 3h4z'/>\
+</svg>");
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');

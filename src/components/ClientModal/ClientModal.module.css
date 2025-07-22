@@ -1,0 +1,68 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--color-surface);
+  color: var(--text-primary);
+  padding: 32px;
+  border-radius: var(--border-radius);
+  width: 100%;
+  max-width: 500px;
+  box-shadow: var(--shadow-md);
+}
+
+.modal h2 {
+  margin-bottom: 24px;
+}
+
+.inputGroup {
+  margin-bottom: 20px;
+}
+
+.inputGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.inputGroup input {
+  width: 100%;
+}
+
+.buttonGroup {
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.cancelButton, .saveButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.cancelButton {
+  background-color: var(--color-surface-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.saveButton {
+  background: var(--gradient-primary);
+  color: white;
+}

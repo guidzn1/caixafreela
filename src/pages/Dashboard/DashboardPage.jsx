@@ -1,3 +1,5 @@
+// src/pages/DashboardPage/DashboardPage.jsx
+
 import { useMemo, useState } from 'react';
 import { Header } from '../../components/Header/Header';
 import { DashboardCard } from '../../components/DashboardCard/DashboardCard';
@@ -19,48 +21,76 @@ export const DashboardPage = () => {
     addTransaction, 
     updateTransaction, 
     deleteTransaction,
-    categorias 
+    categorias,
+    clientes 
   } = useData();
+  
+  console.log(
+    "%c2. [DashboardPage] Clientes recebidos do DataContext:", 
+    "color: #32cd32; font-weight: bold;", 
+    clientes
+  );
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionToEdit, setTransactionToEdit] = useState(null);
   const [modalType, setModalType] = useState('entradas');
-
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const summary = useMemo(() => {
     if (!monthlyData) {
-      return { totalEntradasPrevisto: 0, totalEntradasReal: 0, totalSaidasPrevisto: 0, totalSaidasReal: 0, saldoInicial: 0, caixaFinalReal: 0, caixaFinalPrevisto: 0, entradasProgress: 0, saidasProgress: 0 };
+      return {
+        totalEntradasPrevisto: 0,
+        totalEntradasReal: 0,
+        totalSaidasPrevisto: 0,
+        totalSaidasReal: 0,
+        saldoInicial: 0,
+        caixaFinalReal: 0,
+        caixaFinalPrevisto: 0,
+        entradasProgress: 0,
+        saidasProgress: 0
+      };
     }
     
     const totalEntradasPrevisto = monthlyData.entradas.reduce((acc, t) => acc + (t.valorPrevisto || 0), 0);
-    const totalEntradasReal = monthlyData.entradas.reduce((acc, t) => acc + (t.valorReal || 0), 0);
-    const totalSaidasPrevisto = monthlyData.saidas.reduce((acc, t) => acc + (t.valorPrevisto || 0), 0);
-    const totalSaidasReal = monthlyData.saidas.reduce((acc, t) => acc + (t.valorReal || 0), 0);
-    const saldoInicial = monthlyData.saldoInicial || 0;
-    const caixaFinalReal = saldoInicial + totalEntradasReal - totalSaidasReal;
-    const caixaFinalPrevisto = saldoInicial + totalEntradasPrevisto - totalSaidasPrevisto;
-    const entradasProgress = totalEntradasPrevisto > 0 ? (totalEntradasReal / totalEntradasPrevisto) * 100 : 0;
-    const saidasProgress = totalSaidasPrevisto > 0 ? (totalSaidasReal / totalSaidasPrevisto) * 100 : 0;
+    const totalEntradasReal    = monthlyData.entradas.reduce((acc, t) => acc + (t.valorReal     || 0), 0);
+    const totalSaidasPrevisto  = monthlyData.saidas.reduce  ((acc, t) => acc + (t.valorPrevisto || 0), 0);
+    const totalSaidasReal      = monthlyData.saidas.reduce  ((acc, t) => acc + (t.valorReal     || 0), 0);
+    const saldoInicial         = monthlyData.saldoInicial || 0;
+    const caixaFinalReal       = saldoInicial + totalEntradasReal - totalSaidasReal;
+    const caixaFinalPrevisto   = saldoInicial + totalEntradasPrevisto - totalSaidasPrevisto;
+    const entradasProgress     = totalEntradasPrevisto > 0 ? (totalEntradasReal / totalEntradasPrevisto) * 100 : 0;
+    const saidasProgress       = totalSaidasPrevisto  > 0 ? (totalSaidasReal   / totalSaidasPrevisto ) * 100 : 0;
 
-    return { totalEntradasPrevisto, totalEntradasReal, totalSaidasPrevisto, totalSaidasReal, saldoInicial, caixaFinalReal, caixaFinalPrevisto, entradasProgress, saidasProgress };
+    return {
+      totalEntradasPrevisto,
+      totalEntradasReal,
+      totalSaidasPrevisto,
+      totalSaidasReal,
+      saldoInicial,
+      caixaFinalReal,
+      caixaFinalPrevisto,
+      entradasProgress,
+      saidasProgress
+    };
   }, [monthlyData]);
 
   const insights = useMemo(() => {
     if (!monthlyData || !user) return { userName: '', biggestExpense: null, biggestIncome: null };
-    const userName = user.displayName ? user.displayName.split(' ')[0] : (user.email.split('@')[0] || '');
+    const rawName = user.displayName || user.email.split('@')[0] || '';
+    const userName = rawName.split(' ')[0];
     const capitalizedUserName = userName.charAt(0).toUpperCase() + userName.slice(1);
     const biggestExpense = monthlyData.saidas.length > 0
       ? [...monthlyData.saidas].sort((a, b) => (b.valorReal || 0) - (a.valorReal || 0))[0]
       : null;
-    const biggestIncome = monthlyData.entradas.length > 0
+    const biggestIncome  = monthlyData.entradas.length > 0
       ? [...monthlyData.entradas].sort((a, b) => (b.valorReal || 0) - (a.valorReal || 0))[0]
       : null;
     return { userName: capitalizedUserName, biggestExpense, biggestIncome };
   }, [monthlyData, user]);
 
-  const formatCurrency = (value) => (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formatCurrency = (value) =>
+    (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const handleOpenModal = (type, transaction = null) => {
     setModalType(type);
@@ -74,13 +104,35 @@ export const DashboardPage = () => {
   };
 
   const handleSaveTransaction = async (type, transactionData) => {
-    const dataComTimestamp = { ...transactionData, updatedAt: new Date().toISOString() };
-    if (transactionData.id) {
-      await updateTransaction(type, dataComTimestamp);
-    } else {
-      await addTransaction(type, dataComTimestamp);
-    }
+    console.log('↪ onSave chamado com:', type, transactionData);
     handleCloseModal();
+
+    // Adiciona timestamp e remove campos undefined
+    const rawPayload = { 
+      ...transactionData, 
+      updatedAt: new Date().toISOString() 
+    };
+    const payload = Object.fromEntries(
+      Object.entries(rawPayload).filter(([, v]) => v !== undefined)
+    );
+
+    if (transactionData.id) {
+      try {
+        await updateTransaction(type, payload);
+        toast.success('Transação atualizada com sucesso!');
+      } catch (err) {
+        console.error('Erro ao atualizar transação:', err);
+        toast.error('Não foi possível atualizar a transação. Veja o console.');
+      }
+    } else {
+      try {
+        await addTransaction(type, payload);
+        toast.success('Transação criada com sucesso!');
+      } catch (err) {
+        console.error('Erro ao criar transação:', err);
+        toast.error('Não foi possível criar a transação. Veja o console.');
+      }
+    }
   };
   
   const handleDeleteTransaction = (type, transactionId) => {
@@ -98,12 +150,20 @@ export const DashboardPage = () => {
   };
 
   const handleToggleConfirm = async (type, transaction) => {
-    const updatedTransaction = { ...transaction };
-    updatedTransaction.confirmado = !transaction.confirmado;
-    if (updatedTransaction.confirmado && (!transaction.valorReal || transaction.valorReal === 0)) {
-      updatedTransaction.valorReal = transaction.valorPrevisto;
+    const updated = {
+      ...transaction,
+      confirmado: !transaction.confirmado,
+      valorReal: !transaction.confirmado && !transaction.valorReal
+        ? transaction.valorPrevisto
+        : transaction.valorReal
+    };
+    try {
+      await updateTransaction(type, updated);
+      toast.success('Status atualizado!');
+    } catch (err) {
+      console.error('Erro ao atualizar status:', err);
+      toast.error('Não foi possível atualizar o status. Veja o console.');
     }
-    await updateTransaction(type, updatedTransaction);
   };
 
   if (loading) {
@@ -128,7 +188,7 @@ export const DashboardPage = () => {
   };
 
   const sortedEntradas = sortTransactions(monthlyData?.entradas);
-  const sortedSaidas = sortTransactions(monthlyData?.saidas);
+  const sortedSaidas   = sortTransactions(monthlyData?.saidas);
 
   return (
     <div className={styles.dashboard}>
@@ -158,7 +218,11 @@ export const DashboardPage = () => {
             progressValue={summary.saidasProgress}
             progressColor="var(--color-danger)"
           />
-          <DashboardCard title="Caixa Final" value={formatCurrency(summary.caixaFinalReal)} detail={`Previsto: ${formatCurrency(summary.caixaFinalPrevisto)}`} />
+          <DashboardCard 
+            title="Caixa Final" 
+            value={formatCurrency(summary.caixaFinalReal)} 
+            detail={`Previsto: ${formatCurrency(summary.caixaFinalPrevisto)}`} 
+          />
         </div>
 
         {(insights.biggestIncome || insights.biggestExpense) && (
@@ -166,30 +230,56 @@ export const DashboardPage = () => {
             {insights.biggestIncome && insights.biggestIncome.valorReal > 0 && (
               <div className={styles.insightCard}>
                 <strong>💰 Maior Entrada:</strong>
-                <span>{insights.biggestIncome.descricao} ({formatCurrency(insights.biggestIncome.valorReal)})</span>
+                <span>
+                  {insights.biggestIncome.descricao} ({formatCurrency(insights.biggestIncome.valorReal)})
+                </span>
               </div>
             )}
             {insights.biggestExpense && insights.biggestExpense.valorReal > 0 && (
               <div className={styles.insightCard}>
                 <strong>💸 Maior Saída:</strong>
-                <span>{insights.biggestExpense.descricao} ({formatCurrency(insights.biggestExpense.valorReal)})</span>
+                <span>
+                  {insights.biggestExpense.descricao} ({formatCurrency(insights.biggestExpense.valorReal)})
+                </span>
               </div>
             )}
           </div>
         )}
 
         <div className={styles.quickActions}>
-          <button onClick={() => handleOpenModal('entradas')} className={styles.actionButtonEntrada}>
+          <button 
+            onClick={() => handleOpenModal('entradas')} 
+            className={styles.actionButtonEntrada}
+          >
             + Nova Entrada
           </button>
-          <button onClick={() => handleOpenModal('saidas')} className={styles.actionButtonSaida}>
+          <button 
+            onClick={() => handleOpenModal('saidas')} 
+            className={styles.actionButtonSaida}
+          >
             + Nova Saída
           </button>
         </div>
 
         <div className={styles.tablesGrid}>
-          <TransactionsTable title="Entradas" data={sortedEntradas} type="entradas" onAdd={handleOpenModal} onEdit={handleOpenModal} onDelete={handleDeleteTransaction} onToggleConfirm={handleToggleConfirm} />
-          <TransactionsTable title="Saídas" data={sortedSaidas} type="saidas" onAdd={handleOpenModal} onEdit={handleOpenModal} onDelete={handleDeleteTransaction} onToggleConfirm={handleToggleConfirm} />
+          <TransactionsTable 
+            title="Entradas" 
+            data={sortedEntradas} 
+            type="entradas" 
+            onAdd={handleOpenModal} 
+            onEdit={handleOpenModal} 
+            onDelete={handleDeleteTransaction} 
+            onToggleConfirm={handleToggleConfirm} 
+          />
+          <TransactionsTable 
+            title="Saídas" 
+            data={sortedSaidas} 
+            type="saidas" 
+            onAdd={handleOpenModal} 
+            onEdit={handleOpenModal} 
+            onDelete={handleDeleteTransaction} 
+            onToggleConfirm={handleToggleConfirm} 
+          />
         </div>
         
         <ReportsSection />
@@ -202,6 +292,7 @@ export const DashboardPage = () => {
         transactionToEdit={transactionToEdit}
         type={modalType}
         categorias={categorias}
+        clientes={clientes}
       />
 
       <ConfirmModal 
