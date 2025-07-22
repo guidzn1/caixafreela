@@ -15,8 +15,6 @@ export const TransactionModal = ({
   categorias = [],
   clientes = []
 }) => {
-  console.log("%c[TransactionModal] clientes props:", "color: #1e90ff; font-weight: bold;", clientes);
-
   const isEditing = Boolean(transactionToEdit);
 
   const [clienteId, setClienteId] = useState('');
@@ -33,17 +31,15 @@ export const TransactionModal = ({
   const [modoCriacaoCategoria, setModoCriacaoCategoria] = useState(false);
   const [novaCategoria, setNovaCategoria] = useState('');
 
-  // abrir modal de criação de cliente
-  const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const { addCliente, updateCategorias } = useData();
+  const [isClientModalOpen, setIsClientModalOpen] = useState(false);
 
-  // quando o modal abre ou muda transactionToEdit/clientes/categorias
   useEffect(() => {
     if (!isOpen) return;
+
     if (isEditing) {
-      // Carrega campos existentes
+      // Edição: carrega valores existentes
       setClienteId(transactionToEdit.clienteId || '');
-      // remove sufixo " - nomeCliente" se houver
       let desc = transactionToEdit.descricao || '';
       if (type === 'entradas' && transactionToEdit.clienteNome) {
         desc = desc.replace(` - ${transactionToEdit.clienteNome}`, '');
@@ -59,8 +55,8 @@ export const TransactionModal = ({
       setTotalParcelas(transactionToEdit.parcelamentoInfo?.total?.toString() || '');
       setParcelasPagas(transactionToEdit.parcelamentoInfo?.pagas?.toString() || '0');
     } else {
-      // valores padrão para new
-      setClienteId(clientes[0]?.id || '');
+      // Novo: força placeholder
+      setClienteId('');
       setDescricao('');
       setValorPrevisto('');
       setValorReal('');
@@ -72,37 +68,33 @@ export const TransactionModal = ({
       setTotalParcelas('');
       setParcelasPagas('0');
     }
+
     setModoCriacaoCategoria(false);
     setNovaCategoria('');
-  }, [isOpen, transactionToEdit, type, clientes, categorias]);
+  }, [isOpen, transactionToEdit, clientes, categorias, type]);
 
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const selectedClient = clientes.find(c => c.id === clienteId);
 
-    const finalDescription = type === 'entradas' && selectedClient
+    const finalDescription = (type === 'entradas' && selectedClient)
       ? `${descricao.trim()} - ${selectedClient.nome}`
       : descricao.trim();
 
     const payload = {
-      // Se for edição, manter o id para update; se for criação, omite id para add
       ...(isEditing && { id: transactionToEdit.id }),
       descricao: finalDescription,
       data,
       valorPrevisto: parseFloat(valorPrevisto) || 0,
       valorReal: parseFloat(valorReal) || 0,
       confirmado: isEditing ? transactionToEdit.confirmado : false,
-      // só para entradas
-      ...(type === 'entradas' && { 
-        clienteId: clienteId || null,
-        clienteNome: selectedClient?.nome || null 
+      ...(type === 'entradas' && {
+        clienteId: clienteId,
+        clienteNome: selectedClient?.nome || null
       }),
-      // só para saídas
       ...(type === 'saidas' && { categoria }),
-      // recorrência e parcelamento
       isRecorrente,
       mesesRecorrencia: isRecorrente ? parseInt(mesesRecorrencia, 10) : null,
       isParcelado,
@@ -111,14 +103,13 @@ export const TransactionModal = ({
         : null
     };
 
-    console.log('%c[TransactionModal] onSave payload:', 'color: #1e90ff; font-weight:bold;', payload);
     onSave(type, payload);
     onClose();
   };
 
   const handleSaveNewClient = async (clientData) => {
     await addCliente(clientData);
-    toast.success("Cliente adicionado! Feche e abra o formulário para vê-lo na lista.");
+    toast.success("Cliente adicionado! Feche e abra o modal para vê-lo.");
     setIsClientModalOpen(false);
   };
 
@@ -139,7 +130,10 @@ export const TransactionModal = ({
     <>
       <div className={styles.overlay}>
         <div className={styles.modal}>
-          <h2>{isEditing ? 'Editar' : 'Adicionar'} {type === 'entradas' ? 'Entrada' : 'Saída'}</h2>
+          <h2>
+            {isEditing ? 'Editar' : 'Adicionar'}{' '}
+            {type === 'entradas' ? 'Entrada' : 'Saída'}
+          </h2>
           <form onSubmit={handleSubmit}>
             {type === 'entradas' && (
               <div className={styles.inputGroup}>
@@ -150,7 +144,9 @@ export const TransactionModal = ({
                     onChange={e => setClienteId(e.target.value)}
                     required
                   >
-                    {!clientes.length && <option value="">Nenhum cliente</option>}
+                    <option value="" disabled>
+                      -- Selecione um cliente --
+                    </option>
                     {clientes.map(cli => (
                       <option key={cli.id} value={cli.id}>
                         {cli.nome}
@@ -161,8 +157,10 @@ export const TransactionModal = ({
                     type="button"
                     className={styles.addCategoryButton}
                     onClick={() => setIsClientModalOpen(true)}
-                    title="Novo cliente"
-                  >+</button>
+                    title="Adicionar novo cliente"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
             )}
@@ -177,7 +175,6 @@ export const TransactionModal = ({
               />
             </div>
 
-            {/* Campos comuns Data, valores, etc. */}
             <div className={styles.inputGroup}>
               <label>Data</label>
               <input
@@ -218,19 +215,23 @@ export const TransactionModal = ({
                       type="text"
                       value={novaCategoria}
                       onChange={e => setNovaCategoria(e.target.value)}
-                      placeholder="Nova categoria"
+                      placeholder="Nome da nova categoria"
                       autoFocus
                     />
                     <button
                       type="button"
                       className={styles.saveCategoryButton}
                       onClick={handleAddNewCategory}
-                    >Salvar</button>
+                    >
+                      Salvar
+                    </button>
                     <button
                       type="button"
                       className={styles.cancelCategoryButton}
                       onClick={() => setModoCriacaoCategoria(false)}
-                    >X</button>
+                    >
+                      X
+                    </button>
                   </div>
                 ) : (
                   <div className={styles.selectCategoryWrapper}>
@@ -240,21 +241,24 @@ export const TransactionModal = ({
                       required
                     >
                       {categorias.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
                       ))}
                     </select>
                     <button
                       type="button"
                       className={styles.addCategoryButton}
                       onClick={() => setModoCriacaoCategoria(true)}
-                      title="Nova categoria"
-                    >+</button>
+                      title="Adicionar nova categoria"
+                    >
+                      +
+                    </button>
                   </div>
                 )}
               </div>
             )}
 
-            {/* controles recorrência / parcelamento */}
             {!isEditing && (
               <>
                 <div className={styles.checkboxGroup}>
@@ -265,12 +269,14 @@ export const TransactionModal = ({
                     onChange={e => setIsRecorrente(e.target.checked)}
                     disabled={isParcelado}
                   />
-                  <label htmlFor="recorrente">Transação recorrente?</label>
+                  <label htmlFor="recorrente">
+                    Transação recorrente?
+                  </label>
                 </div>
                 {isRecorrente && (
                   <div className={styles.parcelamentoFields}>
                     <div className={styles.inputGroup}>
-                      <label>Meses</label>
+                      <label>Meses de recorrência</label>
                       <input
                         type="number"
                         value={mesesRecorrencia}
@@ -291,7 +297,9 @@ export const TransactionModal = ({
                       onChange={e => setIsParcelado(e.target.checked)}
                       disabled={isRecorrente}
                     />
-                    <label htmlFor="parcelado">Compra parcelada?</label>
+                    <label htmlFor="parcelado">
+                      Compra parcelada?
+                    </label>
                   </div>
                 )}
                 {isParcelado && type === 'saidas' && (
@@ -306,7 +314,7 @@ export const TransactionModal = ({
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label>Parcelas Pagas</label>
+                      <label>Parcelas Já Pagas</label>
                       <input
                         type="number"
                         value={parcelasPagas}
@@ -323,8 +331,12 @@ export const TransactionModal = ({
                 type="button"
                 onClick={onClose}
                 className={styles.cancelButton}
-              >Cancelar</button>
-              <button type="submit" className={styles.saveButton}>Salvar</button>
+              >
+                Cancelar
+              </button>
+              <button type="submit" className={styles.saveButton}>
+                Salvar
+              </button>
             </div>
           </form>
         </div>
