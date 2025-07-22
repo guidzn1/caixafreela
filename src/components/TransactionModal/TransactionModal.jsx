@@ -21,7 +21,7 @@ export const TransactionModal = ({
   const [descricao, setDescricao] = useState('');
   const [valorPrevisto, setValorPrevisto] = useState('');
   const [valorReal, setValorReal] = useState('');
-  const [categoria, setCategoria] = useState('');
+  const [categoria, setCategoria] = useState('');        // <— inicia em ''
   const [data, setData] = useState(new Date().toISOString().slice(0,10));
   const [isRecorrente, setIsRecorrente] = useState(false);
   const [mesesRecorrencia, setMesesRecorrencia] = useState('12');
@@ -36,9 +36,8 @@ export const TransactionModal = ({
 
   useEffect(() => {
     if (!isOpen) return;
-
     if (isEditing) {
-      // Edição: carrega valores existentes
+      // Edição: carrega os valores existentes
       setClienteId(transactionToEdit.clienteId || '');
       let desc = transactionToEdit.descricao || '';
       if (type === 'entradas' && transactionToEdit.clienteNome) {
@@ -48,27 +47,26 @@ export const TransactionModal = ({
       setValorPrevisto(transactionToEdit.valorPrevisto?.toString() || '');
       setValorReal(transactionToEdit.valorReal?.toString() || '');
       setData(transactionToEdit.data || new Date().toISOString().slice(0,10));
-      setCategoria(transactionToEdit.categoria || categorias[0] || '');
+      setCategoria(transactionToEdit.categoria || '');
       setIsRecorrente(!!transactionToEdit.isRecorrente);
       setMesesRecorrencia(transactionToEdit.mesesRecorrencia?.toString() || '12');
       setIsParcelado(!!transactionToEdit.isParcelado);
       setTotalParcelas(transactionToEdit.parcelamentoInfo?.total?.toString() || '');
       setParcelasPagas(transactionToEdit.parcelamentoInfo?.pagas?.toString() || '0');
     } else {
-      // Novo: força placeholder
+      // Novo: force placeholder (valor vazio)
       setClienteId('');
       setDescricao('');
       setValorPrevisto('');
       setValorReal('');
       setData(new Date().toISOString().slice(0,10));
-      setCategoria(categorias[0] || '');
+      setCategoria('');                              // <— aqui também
       setIsRecorrente(false);
       setMesesRecorrencia('12');
       setIsParcelado(false);
       setTotalParcelas('');
       setParcelasPagas('0');
     }
-
     setModoCriacaoCategoria(false);
     setNovaCategoria('');
   }, [isOpen, transactionToEdit, clientes, categorias, type]);
@@ -78,11 +76,9 @@ export const TransactionModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     const selectedClient = clientes.find(c => c.id === clienteId);
-
     const finalDescription = (type === 'entradas' && selectedClient)
       ? `${descricao.trim()} - ${selectedClient.nome}`
       : descricao.trim();
-
     const payload = {
       ...(isEditing && { id: transactionToEdit.id }),
       descricao: finalDescription,
@@ -91,7 +87,7 @@ export const TransactionModal = ({
       valorReal: parseFloat(valorReal) || 0,
       confirmado: isEditing ? transactionToEdit.confirmado : false,
       ...(type === 'entradas' && {
-        clienteId: clienteId,
+        clienteId,
         clienteNome: selectedClient?.nome || null
       }),
       ...(type === 'saidas' && { categoria }),
@@ -102,7 +98,6 @@ export const TransactionModal = ({
         ? { total: parseInt(totalParcelas, 10), pagas: parseInt(parcelasPagas, 10) || 0 }
         : null
     };
-
     onSave(type, payload);
     onClose();
   };
@@ -240,6 +235,9 @@ export const TransactionModal = ({
                       onChange={e => setCategoria(e.target.value)}
                       required
                     >
+                      <option value="" disabled>
+                        -- Selecione uma categoria --
+                      </option>
                       {categorias.map(cat => (
                         <option key={cat} value={cat}>
                           {cat}
