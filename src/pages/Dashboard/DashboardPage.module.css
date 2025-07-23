@@ -127,3 +127,59 @@
     grid-template-columns: 1fr;
   }
 }
+/* Cabeçalho com ícone de editar */
+.saldoCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.editIcon {
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.editIcon:hover {
+  opacity: 1;
+}
+
+/* Wrapper interno do input + botão */
+.saldoInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Input de saldo dentro do card */
+.saldoInput {
+  width: 80px;
+  padding: 4px 6px;
+  font-size: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  text-align: right;
+}
+
+/* Botão de confirmar edição */
+.confirmButton {
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.confirmButton:hover {
+  opacity: 1;
+}
+
+/* Layout geral de cards */
+.cardsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
