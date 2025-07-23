@@ -1,3 +1,5 @@
+/* src/components/Header/Header.module.css */
+
 /* --- ESTRUTURA PRINCIPAL COM GRADIENTE AZUL + EFEITO GLASSMORPHISM --- */
 .header {
   background: linear-gradient(45deg, rgba(13, 110, 253, 0.85), rgba(10, 88, 202, 0.85));
@@ -58,7 +60,10 @@
 }
 
 /* --- SEÇÃO CENTRAL (SELETOR DE MÊS) --- */
-
+.centerSection {
+  display: flex;
+  align-items: center;
+}
 .monthSelector {
   display: flex;
   align-items: center;
@@ -134,6 +139,25 @@
 }
 .profileLink:hover .profileCircle {
   transform: scale(1.1);
+}
+
+/* --- BOTÃO DE ALTERNAR TEMA --- */
+.themeToggleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.themeToggleButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: rotate(15deg);
 }
 
 /* --- MENU MÓVEL --- */
@@ -221,22 +245,20 @@
     gap: 0;
     width: 100%;
   }
-
   .mobileNav .navLink {
     padding: 16px;
     color: rgba(255, 255, 255, 0.8);
     border-bottom: none;
   }
-
   .mobileNav .navLink:hover {
     background-color: rgba(255, 255, 255, 0.1);
   }
-
   .mobileNav .navLink.active {
     color: white;
     background-color: rgba(255, 255, 255, 0.1);
   }
 
+  /* seletor de mês dentro do menu móvel */
   .mobileMonthSelector {
     display: flex;
     align-items: center;
@@ -245,8 +267,33 @@
     background-color: rgba(255, 255, 255, 0.1);
     padding: 6px;
     border-radius: var(--border-radius);
-    margin-top: 16px;
     margin-bottom: 24px;
+  }
+  .mobileMonthSelector .monthButton:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  .mobileMonthSelector .monthText {
+    color: white;
+  }
+
+  /* reutilizar o estilo de tema no botão mobile */
+  .mobileButton.themeToggleButton {
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    width: auto;
+    height: auto;
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .mobileButton.themeToggleButton:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: none;
   }
 
   .mobileActions {
@@ -256,13 +303,11 @@
     width: 100%;
     margin-top: auto;
   }
-
   .mobileDivider {
     border: none;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     margin: 16px 0;
   }
-
   .mobileProfileLink,
   .mobileButton {
     display: flex;
@@ -280,36 +325,8 @@
     text-align: left;
     width: 100%;
   }
-
   .mobileProfileLink:hover,
   .mobileButton:hover {
     background-color: rgba(255, 255, 255, 0.1);
   }
-}
-/* Adicione este estilo ao seu ficheiro Header.module.css */
-.themeToggleButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  color: var(--text-primary);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.themeToggleButton:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  transform: rotate(15deg);
-}
-
-/* Garante que os ícones fiquem com a cor certa no header com gradiente */
-.header .themeToggleButton {
-  color: white;
-  border-color: rgba(255, 255, 255, 0.5);
-}
-.header .themeToggleButton:hover {
-  background-color: rgba(255, 255, 255, 0.1);
 }
